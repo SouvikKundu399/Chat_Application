@@ -16,9 +16,11 @@ app.use(cookieParser());
 
 
 import userRoute from "./routes/user.routes.js"
+import messageRouter from "./routes/message.routes.js";
 
 
-app.use("/api/lt/users",userRoute)
+app.use("/api/lt/users", userRoute)
+app.use("/api/lt/msg", messageRouter)
 
 export {app}
 

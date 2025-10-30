@@ -58,7 +58,7 @@ const getMsg = asyncHandeler(async(req,res) => {
 })
 
 const deleteMsg = asyncHandeler(async(req,res) => {
-    const {chatId} = req.params
+    const {msgID : chatId} = req.params
     if(!chatId){
         throw new apiError(501,"Chat ID was not found")
     }
@@ -79,7 +79,7 @@ const deleteMsg = asyncHandeler(async(req,res) => {
 })
 
 const editMsg = asyncHandeler(async(req,res) => {
-    const {chatId} = req.params
+    const {msgID : chatId} = req.params
     const {newMsg} = req.body
     if(!chatId || !newMsg){
         throw new apiError(501,"Chat ID or newMsg was not found")
