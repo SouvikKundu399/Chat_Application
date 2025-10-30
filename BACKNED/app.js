@@ -17,10 +17,12 @@ app.use(cookieParser());
 
 import userRoute from "./routes/user.routes.js"
 import messageRouter from "./routes/message.routes.js";
+import chatRouter from "./routes/chat.routes.js";
 
 
 app.use("/api/lt/users", userRoute)
 app.use("/api/lt/msg", messageRouter)
+app.use("/api/lt/chat", chatRouter)
 
 export {app}
 

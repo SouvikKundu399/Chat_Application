@@ -62,3 +62,7 @@ const getAllConnections = asyncHandeler(async(req,res) => {
     );  
 })
 
+export {
+    addChat,
+    getAllConnections
+}
