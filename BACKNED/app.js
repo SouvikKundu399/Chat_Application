@@ -8,7 +8,7 @@ app.use(cors({
     credentials: true
 }))
 
-app.use(express.json({limit: '16kb'}));
+app.use(express.json());
 app.use(express.urlencoded({ extended: true,limit: '16kb' }));
 app.use(express.static("public"));
 app.use(cookieParser());
@@ -20,7 +20,7 @@ import messageRouter from "./routes/message.routes.js";
 import chatRouter from "./routes/chat.routes.js";
 
 
-app.use("/api/lt/users", userRoute)
+app.use("/api/lt/user", userRoute)
 app.use("/api/lt/msg", messageRouter)
 app.use("/api/lt/chat", chatRouter)
 

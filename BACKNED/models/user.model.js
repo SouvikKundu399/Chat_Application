@@ -9,7 +9,7 @@ const userSchema = new Schema({
         type: String,
         trim: true,
         lowercase: true,
-        unique: true,
+        
     },
     description: {
         type: String
@@ -28,7 +28,7 @@ const userSchema = new Schema({
         type: String,
         lowercase: true,
         trim: true,
-        unique: true,
+        
     }
 
 }, {

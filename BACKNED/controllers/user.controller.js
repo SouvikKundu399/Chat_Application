@@ -2,19 +2,19 @@ import apiError from "../utils/apiError.utils.js";
 import asyncHandeler from "../utils/asynHandler.utils.js";
 import apiResponse from "../utils/apiResponse.utils.js";
 import User from "../models/user.model.js"
-import { sendOtp } from "../utils/otpVerificaton.utils.js";
+import  sendOtp from "../utils/otpVerificaton.utils.js";
 import uploadOnCloudinary from "../utils/cloudinary.utils.js";
 
 // phoneNumberVerificationViaOTP
 
-const phoneNumberVerificationViaOTP = ((otp) => {
-    // verify otp logic
-    return true // return false if otp is not matching
-})
+// const phoneNumberVerificationViaOTP = ((otp) => {
+//     // verify otp logic
+//     return true // return false if otp is not matching
+// })
 
-const generateOTP = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString()
-}
+// const generateOTP = () => {
+//     return Math.floor(100000 + Math.random() * 900000).toString()
+// }
 
 
 const registerUser = asyncHandeler(async(req,res) => {
@@ -35,18 +35,18 @@ const registerUser = asyncHandeler(async(req,res) => {
     if(existedUser){
         throw new apiError(400,"User with this phone number has already existed")
     }
-    const otp = generateOTP()
-    sendOtp(phoneNum,otp)  
-    if (!phoneNumberVerificationViaOTP(otp)) {
-        throw new apiError(400, "Your OTP is not matching")
-    }
+    // const otp = generateOTP()
+    // sendOtp(phoneNum,otp)  
+    // if (!phoneNumberVerificationViaOTP(otp)) {
+    //     throw new apiError(400, "Your OTP is not matching")
+    // }
 
     const avatarPath = req.fiels?.Path?.[0]?.path
     const newUser = await User.create({
         fullName, 
         userName, 
         description, 
-        avatar : avatarPath.url, 
+        avatar : avatarPath?.url, 
         phoneNum, 
         mail
     })
@@ -56,14 +56,14 @@ const registerUser = asyncHandeler(async(req,res) => {
     }
 
 
-    const currecntUserId = `${newUser._id}`
+    const currentUserId = `${newUser._id}`
     const options = {
         httpOnly: true,
         secure: true
     }
     return res
         .status(200)
-        .cookie("currecntUserId", currecntUserId, options)
+        .cookie("currentUserId", currentUserId, options)
         .json(
             new apiResponse(
                 200,
@@ -76,28 +76,30 @@ const registerUser = asyncHandeler(async(req,res) => {
 })
 
 const logIn = asyncHandeler(async(req,res) => {
+    console.log("request body: ",typeof req.body.phoneNum);
     const {phoneNum} = req.body
+    console.log("phoneNum: ",phoneNum);
     if(!phoneNum){
-        throw new apiError(400,"Plz enter your phone number")
+        throw new apiError(400,"phoneNumber is required")
     }
-    const isExistPhoneNum = User.findOne({phoneNum})
+    const isExistPhoneNum = await User.findOne({phoneNum})
     if(!isExistPhoneNum){
         throw new apiError(400, "Plz register your phone number")
     }
-    const otp = generateOTP()
-    sendOtp(phoneNum, otp)
-    if (!phoneNumberVerificationViaOTP(otp)){
-        throw new apiError(400, "Your OTP is not matching")
-    }
+    // const otp = generateOTP()
+    // sendOtp(phoneNum, otp)
+    // if (!phoneNumberVerificationViaOTP(otp)){
+    //     throw new apiError(400, "Your OTP is not matching")
+    // }
     const user = isExistPhoneNum
-    const currecntUserId = `${user._id}`
+    const currentUserId = `${user._id}`
     const options = {
         httpOnly: true,
         secure: true
     }
     return res
         .status(200)
-        .cookie("currecntUserId", currecntUserId, options)
+        .cookie("currentUserId", currentUserId, options)
         .json(
             new apiResponse(
                 200,
@@ -112,14 +114,24 @@ const logIn = asyncHandeler(async(req,res) => {
 })
 
 const logOut = asyncHandeler(async(req,res) => {
-    req.user = ""
+    await User.findByIdAndUpdate(
+        req.user._id,
+        {
+            $unset: {
+                currentUserId: 1
+            }
+        },
+        {   
+            new: true
+        }
+    )
     const options = {
         httpOnly: true,
         secure: true
     }
     return res
         .status(200)
-        .cookie("currecntUserId", options)
+        .cookie("currentUserId","", options)
         .json(
             new apiResponse(
                 200,
@@ -134,11 +146,12 @@ const updateUserInfo = asyncHandeler(async(req,res) => {
     
     const information = [fullName, userName, description, mail]
 
-    const isEmptyInfo = !information.every((info) => info ==="" )
+    const isEmptyInfo = information.every((info) => info ==="" )
 
-    if(!isEmptyInfo){
+    if(isEmptyInfo){
         throw new apiError(400,"Plz provide your information to update")
     }
+    console.log("req.user._id: ",req.user._id);
     const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -149,6 +162,7 @@ const updateUserInfo = asyncHandeler(async(req,res) => {
         },
         {new: true}
     )
+    console.log("updatedUser: ",updatedUser);
     if(!updatedUser){
         throw new apiError(500,"User Information is unsuccessful to update")
     }
@@ -168,11 +182,18 @@ const updateUserInfo = asyncHandeler(async(req,res) => {
 })
 
 const updateAvatarImage = asyncHandeler(async(req,res) => {
-    const avatarPath = req.fiels?.avatar?.[0]
+    console.log("avatarPath: ", req.file);
+    const avatarPath = req.file?.path;
+    if(!avatarPath){
+        throw new apiError(400,"Avatar image is required")
+    }
+    const newAvatar = await uploadOnCloudinary(avatarPath)
+    console.log("newAvatar: ",newAvatar);
+    if(!newAvatar){
+        throw new apiError(500,"Avatar is unsuccessful to upload on cloudinary")
+    }
 
-    const newAvatar = uploadOnCloudinary(avatarPath)
-
-    const updatedUser = User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
             avatar: newAvatar.url
@@ -198,21 +219,22 @@ const updateAvatarImage = asyncHandeler(async(req,res) => {
 })
 
 const updatePhoneNumber = asyncHandeler(async (req, res) => {
-    const { oldPhoneNum,newPhoneNum } = req.body
-    if (!oldPhoneNum) {
-        throw new apiError(400, "Plz enter your phone number")
+    const {newPhoneNum } = req.body
+    const oldPhoneNum = req.user.phoneNum
+    if (!oldPhoneNum || !newPhoneNum) {
+        throw new apiError(400, "new phone number is required")
     }
-    const isExistPhoneNum = User.findOne({ phoneNum : oldPhoneNum })
+    const isExistPhoneNum = await User.findOne({ phoneNum : oldPhoneNum })
     if (!isExistPhoneNum) {
         throw new apiError(400, "Plz register your phone number")
     }
-    const otp = generateOTP()
-    sendOtp(phoneNum, otp)
-    if (!phoneNumberVerificationViaOTP(otp)) {
-        throw new apiError(400, "Your OTP is not matching")
-    }
+    // const otp = generateOTP()
+    // sendOtp(phoneNum, otp)
+    // if (!phoneNumberVerificationViaOTP(otp)) {
+    //     throw new apiError(400, "Your OTP is not matching")
+    // }
 
-    const updatedUser = User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
             phoneNum: newPhoneNum

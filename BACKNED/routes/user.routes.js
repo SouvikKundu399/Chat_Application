@@ -15,7 +15,7 @@ import authentication from "../middlewares/authentication.middleware.js";
 
 const userRoute = Router()
 
-userRoute.route("/register").post(
+userRoute.route("/registration").post(
     upload.fields([
         {
             name : "avatar",

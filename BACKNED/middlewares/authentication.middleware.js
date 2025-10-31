@@ -5,14 +5,16 @@ import User from "../models/user.model.js";
 
 const authentication = asyncHandeler(async(req,res,next) => {
     try {
-        const userId = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "")
-    
+        const userId = req.cookies?.currentUserId || req.headers?.currentUserId
+        console.log("authentication middleware called");
+        console.log("userId: ", userId);
+        console.log("req.body:", req.body);
         if (!userId){
             throw new apiError(401,"user must be loggedIn")
         }
     
-        const user = User.findById(userId?._id)
-    
+        const user = await User.findById(userId)
+        console.log("user: ", user);
         if (!user) {
             throw new apiError(501, "no user found")
         }
@@ -20,7 +22,7 @@ const authentication = asyncHandeler(async(req,res,next) => {
         req.user = user
         next()
     } catch (error) {
-        throw new apiError(401,"Authentication Problem")
+        throw new apiError(401,"User need To be loggedIn")
     }
 
 
