@@ -13,7 +13,10 @@ chatRouter.route('/addChat').post(
     addChat
 );
 
-// chatRouter.route('/').get(getAllConnections);
+chatRouter.route('/getAllConnections').get(
+    authentication,
+    getAllConnections
+);
 
 
 export default chatRouter;

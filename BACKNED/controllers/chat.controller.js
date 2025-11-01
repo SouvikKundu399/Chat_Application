@@ -43,11 +43,13 @@ const addChat = asyncHandeler(async(req,res) => {
 })
 
 const getAllConnections = asyncHandeler(async(req,res) => {
+    console.log("req.user",req.user);
     const allConnections = await Chat.find({
-        members: { $in: [req.user._id] },
+        members: { $in: [req.user?._id] },
     }).populate("members","userName fullName avatar phoneNum mail description");
 
-    if(!allConnections){
+    console.log("allConnections",allConnections);
+    if(allConnections.length === 0){
         throw new apiError(500,"Unable to fetch connections")
     }   
 

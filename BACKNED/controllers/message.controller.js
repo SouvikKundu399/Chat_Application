@@ -29,7 +29,7 @@ const sendMsg = asyncHandeler(async(req,res) => {
             200,
             "Message sent successfully",
             newMessage,
-            req.originalUrl
+            
         )
     );
 })
@@ -58,14 +58,17 @@ const getMsg = asyncHandeler(async(req,res) => {
 })
 
 const deleteMsg = asyncHandeler(async(req,res) => {
-    const {msgID : chatId} = req.params
-    if(!chatId){
-        throw new apiError(501,"Chat ID was not found")
+    const {msgID} = req.params
+    console.log(msgID);
+    if (!msgID){
+        throw new apiError(404,"Message ID was not found")
     }
-    const deletedMsg = await Message.deleteOne({chatId})
-    if(!deletedMsg){
+    const deletedMsg =  await Message.deleteOne({_id: msgID})
+    console.log(deletedMsg);
+    if (!deletedMsg.deletedCount){
         throw new apiError(500,"Message deletion unsuccessful")
     }
+
     return res
     .status(200)
     .json(
@@ -79,18 +82,21 @@ const deleteMsg = asyncHandeler(async(req,res) => {
 })
 
 const editMsg = asyncHandeler(async(req,res) => {
-    const {msgID : chatId} = req.params
+    const {msgID} = req.params
     const {newMsg} = req.body
-    if(!chatId || !newMsg){
-        throw new apiError(501,"Chat ID or newMsg was not found")
+    if (!msgID || !newMsg){
+        throw new apiError(501,"Message ID or newMsg was not found")
     }
-    const updatedMsg = await Message.findByIdAndUpdate(
-        chatId,
-        newMsg,
+    console.log(msgID,newMsg);
+    const updatedMsg = await Message.findOneAndUpdate(
+        { _id: msgID, senderId: req.user._id },
         {
-            new : true
-        }
-    )
+            message: newMsg,
+            updatedAt: new Date() 
+        },
+        { new: true }
+    );
+    console.log(updatedMsg);
     if(!updatedMsg){
         throw new apiError(500,"Message update unsuccessful")
     }
