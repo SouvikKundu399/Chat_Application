@@ -192,7 +192,7 @@ const updateAvatarImage = asyncHandeler(async(req,res) => {
     if(!newAvatar){
         throw new apiError(500,"Avatar is unsuccessful to upload on cloudinary")
     }
-
+    console.log("avatar url: ",newAvatar);
     const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -271,7 +271,7 @@ const getUser = asyncHandeler(async (req, res) => {
                 },
                 "User Fetched Successfully"
             )
-        )       
+        )
 })
 
 
