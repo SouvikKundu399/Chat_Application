@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { nanoid } from 'nanoid';
 import axios from 'axios';
-
+import { useNavigate } from 'react-router-dom';
 function Registration() {
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -39,6 +40,7 @@ function Registration() {
         { withCredentials: true }
       );
       alert("User Registered Successfully!");
+      navigate('/allcontacts');
     } catch (error) {
       console.error("Error ❌:", error.response?.data || error);
       alert(error.response?.data?.message || "Failed to register");

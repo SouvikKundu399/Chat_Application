@@ -2,7 +2,7 @@ import apiError from "../utils/apiError.utils.js";
 import asyncHandeler from "../utils/asynHandler.utils.js";
 import apiResponse from "../utils/apiResponse.utils.js";
 import User from "../models/user.model.js"
-import  sendOtp from "../utils/otpVerificaton.utils.js";
+import sendOtp from "../utils/otpVerificaton.utils.js";
 import uploadOnCloudinary from "../utils/cloudinary.utils.js";
 
 // phoneNumberVerificationViaOTP
@@ -17,23 +17,23 @@ import uploadOnCloudinary from "../utils/cloudinary.utils.js";
 // }
 
 
-const registerUser = asyncHandeler(async(req,res) => {
+const registerUser = asyncHandeler(async (req, res) => {
     // get user detail from user
     // check phone number is null or not
     // add new user 
     // verify opt
     // login user
 
-    const {fullName,userName,description,phoneNum,mail} = req.body
+    const { fullName, userName, description, phoneNum, mail } = req.body
 
-    if(!phoneNum){
-        throw new apiError(401,"Phone Number is required")
+    if (!phoneNum) {
+        throw new apiError(401, "Phone Number is required")
     }
 
 
-    const existedUser =  await User.findOne({phoneNum})
-    if(existedUser){
-        throw new apiError(400,"User with this phone number has already existed")
+    const existedUser = await User.findOne({ phoneNum })
+    if (existedUser) {
+        throw new apiError(400, "User with this phone number has already existed")
     }
     // const otp = generateOTP()
     // sendOtp(phoneNum,otp)  
@@ -43,23 +43,24 @@ const registerUser = asyncHandeler(async(req,res) => {
 
     const avatarPath = req.fiels?.Path?.[0]?.path
     const newUser = await User.create({
-        fullName, 
-        userName, 
-        description, 
-        avatar : avatarPath?.url, 
-        phoneNum, 
+        fullName,
+        userName,
+        description,
+        avatar: avatarPath?.url,
+        phoneNum,
         mail
     })
 
-    if(!newUser){
-        throw new apiError(500,"User is unsuccessful to register")
+    if (!newUser) {
+        throw new apiError(500, "User is unsuccessful to register")
     }
 
 
     const currentUserId = `${newUser._id}`
     const options = {
         httpOnly: true,
-        secure: true
+        sameSite: "lax",
+        secure: false
     }
     return res
         .status(200)
@@ -75,15 +76,15 @@ const registerUser = asyncHandeler(async(req,res) => {
         )
 })
 
-const logIn = asyncHandeler(async(req,res) => {
-    console.log("request body: ",typeof req.body.phoneNum);
-    const {phoneNum} = req.body
-    console.log("phoneNum: ",phoneNum);
-    if(!phoneNum){
-        throw new apiError(400,"phoneNumber is required")
+const logIn = asyncHandeler(async (req, res) => {
+    console.log("request body: ", typeof req.body.phoneNum);
+    const { phoneNum } = req.body
+    console.log("phoneNum: ", phoneNum);
+    if (!phoneNum) {
+        throw new apiError(400, "phoneNumber is required")
     }
-    const isExistPhoneNum = await User.findOne({phoneNum})
-    if(!isExistPhoneNum){
+    const isExistPhoneNum = await User.findOne({ phoneNum })
+    if (!isExistPhoneNum) {
         throw new apiError(400, "Plz register your phone number")
     }
     // const otp = generateOTP()
@@ -95,7 +96,8 @@ const logIn = asyncHandeler(async(req,res) => {
     const currentUserId = `${user._id}`
     const options = {
         httpOnly: true,
-        secure: true
+        sameSite: "lax",
+        secure: false
     }
     return res
         .status(200)
@@ -110,10 +112,10 @@ const logIn = asyncHandeler(async(req,res) => {
             )
         )
 
-    
+
 })
 
-const logOut = asyncHandeler(async(req,res) => {
+const logOut = asyncHandeler(async (req, res) => {
     await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -121,17 +123,18 @@ const logOut = asyncHandeler(async(req,res) => {
                 currentUserId: 1
             }
         },
-        {   
+        {
             new: true
         }
     )
     const options = {
         httpOnly: true,
-        secure: true
+        sameSite: "lax",
+        secure: false
     }
     return res
         .status(200)
-        .cookie("currentUserId","", options)
+        .cookie("currentUserId", "", options)
         .json(
             new apiResponse(
                 200,
@@ -141,17 +144,17 @@ const logOut = asyncHandeler(async(req,res) => {
         )
 })
 
-const updateUserInfo = asyncHandeler(async(req,res) => {
+const updateUserInfo = asyncHandeler(async (req, res) => {
     const { fullName, userName, description, mail } = req.body
-    
+
     const information = [fullName, userName, description, mail]
 
-    const isEmptyInfo = information.every((info) => info ==="" )
+    const isEmptyInfo = information.every((info) => info === "")
 
-    if(isEmptyInfo){
-        throw new apiError(400,"Plz provide your information to update")
+    if (isEmptyInfo) {
+        throw new apiError(400, "Plz provide your information to update")
     }
-    console.log("req.user._id: ",req.user._id);
+    console.log("req.user._id: ", req.user._id);
     const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
@@ -160,11 +163,11 @@ const updateUserInfo = asyncHandeler(async(req,res) => {
             description,
             mail
         },
-        {new: true}
+        { new: true }
     )
-    console.log("updatedUser: ",updatedUser);
-    if(!updatedUser){
-        throw new apiError(500,"User Information is unsuccessful to update")
+    console.log("updatedUser: ", updatedUser);
+    if (!updatedUser) {
+        throw new apiError(500, "User Information is unsuccessful to update")
     }
 
     return res
@@ -181,28 +184,28 @@ const updateUserInfo = asyncHandeler(async(req,res) => {
 
 })
 
-const updateAvatarImage = asyncHandeler(async(req,res) => {
+const updateAvatarImage = asyncHandeler(async (req, res) => {
     console.log("avatarPath: ", req.file);
     const avatarPath = req.file?.path;
-    if(!avatarPath){
-        throw new apiError(400,"Avatar image is required")
+    if (!avatarPath) {
+        throw new apiError(400, "Avatar image is required")
     }
     const newAvatar = await uploadOnCloudinary(avatarPath)
-    console.log("newAvatar: ",newAvatar);
-    if(!newAvatar){
-        throw new apiError(500,"Avatar is unsuccessful to upload on cloudinary")
+    console.log("newAvatar: ", newAvatar);
+    if (!newAvatar) {
+        throw new apiError(500, "Avatar is unsuccessful to upload on cloudinary")
     }
-    console.log("avatar url: ",newAvatar);
+    console.log("avatar url: ", newAvatar);
     const updatedUser = await User.findByIdAndUpdate(
         req.user._id,
         {
             avatar: newAvatar.url
         },
-        {new: true}     
+        { new: true }
     )
 
-    if(!updatedUser){
-        throw new apiError(500,"User Avatar is unsuccessful to update")
+    if (!updatedUser) {
+        throw new apiError(500, "User Avatar is unsuccessful to update")
     }
 
     return res
@@ -219,12 +222,12 @@ const updateAvatarImage = asyncHandeler(async(req,res) => {
 })
 
 const updatePhoneNumber = asyncHandeler(async (req, res) => {
-    const {newPhoneNum } = req.body
+    const { newPhoneNum } = req.body
     const oldPhoneNum = req.user.phoneNum
     if (!oldPhoneNum || !newPhoneNum) {
         throw new apiError(400, "new phone number is required")
     }
-    const isExistPhoneNum = await User.findOne({ phoneNum : oldPhoneNum })
+    const isExistPhoneNum = await User.findOne({ phoneNum: oldPhoneNum })
     if (!isExistPhoneNum) {
         throw new apiError(400, "Plz register your phone number")
     }

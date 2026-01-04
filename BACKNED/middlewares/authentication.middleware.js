@@ -5,7 +5,8 @@ import User from "../models/user.model.js";
 
 const authentication = asyncHandeler(async(req,res,next) => {
     try {
-        const userId = req.cookies?.currentUserId || req.headers?.currentUserId
+        // console.log("Cookies: ", req);
+        const userId = req.cookies?.currentUserId || req.heasders?.authorization?.split(" ")[1];
         console.log("authentication middleware called");
         console.log("userId: ", userId);
         console.log("req.body:", req.body);

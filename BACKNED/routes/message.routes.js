@@ -20,7 +20,7 @@ messageRouter.route("/sendMsg/:chatID").post(
     sendMsg
 )
 
-messageRouter.route("/getMsg/:chatId").post(
+messageRouter.route("/getMsg/:contactId").post(
     authentication,
     getMsg
 )

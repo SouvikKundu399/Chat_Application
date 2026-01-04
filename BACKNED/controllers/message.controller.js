@@ -2,6 +2,7 @@ import apiError from "../utils/apiError.utils.js";
 import asyncHandeler from "../utils/asynHandler.utils.js";
 import apiResponse from "../utils/apiResponse.utils.js";
 import Message from "../models/message.model.js";
+import Chat from "../models/chats.model.js";
 
 const sendMsg = asyncHandeler(async(req,res) => {
     const {chatID} = req.params
@@ -10,14 +11,12 @@ const sendMsg = asyncHandeler(async(req,res) => {
         throw new apiError(401,"ChatID or msg is missing")
     }
 
-    const newMessage = Message.create({
+    const newMessage = await Message.create({
         chatId : chatID,
         senderId : req.user?._id,
         message : msg
-    },
-    {
-        new : true
     })
+    console.log("New Message: ",newMessage);
     if(!newMessage){
         throw new apiError(500,"Sending Message is unsuccessful")
     }
@@ -35,13 +34,20 @@ const sendMsg = asyncHandeler(async(req,res) => {
 })
 
 const getMsg = asyncHandeler(async(req,res) => {
-    const {chatId} = req.params
-    if(!chatId){
-        throw new apiError(501,"Chat ID was not found")
+    const {contactId} = req.params
+    if(!contactId){
+        throw new apiError(501,"Contact ID was not found")
     }
-    const allMsg = await Message.find({chatId})
-
-    if(!allMsg){
+    const chatId = await Chat.findOne({
+        members: { $all: [req.user._id, contactId] }
+    }).select("_id");
+    if (!chatId) {
+        throw new apiError(501, "Chat ID was not found")
+    }
+    console.log("Chat ID: ",chatId);
+    const allMsg = await Message.find({ chatId });
+    console.log("All Messages: ",allMsg);
+    if(!allMsg.length){
         throw new apiError(400,"No MSG found")
     }
 
@@ -51,7 +57,7 @@ const getMsg = asyncHandeler(async(req,res) => {
         new apiResponse(
             200,
             "All Messages fetched successfully",
-            allMsg.sort((a,b) => a.createdAt - b.createdAt),
+            allMsg,
             req.originalUrl
         )
     );
@@ -115,14 +121,12 @@ const editMsg = asyncHandeler(async(req,res) => {
 const getChatByUser = asyncHandeler(async(req,res) => {
     const userId = req.user?._id
     const userChats = await Message.find({
-        $or : [
-            {senderId : userId},
-            {members : {$in : [userId]}}
-        ]
+        members: userId
     })
-    .populate("chatId","members")
-    .sort({createdAt : -1})
 
+    
+    .sort({createdAt : -1})
+    console.log("User Chats: ",userChats);
     if(!userChats){
         throw new apiError(404,"No chats found for this user")
     }
