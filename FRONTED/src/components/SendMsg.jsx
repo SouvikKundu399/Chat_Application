@@ -2,11 +2,14 @@ import React, { useState } from 'react'
 import Input from './Input'
 import Button from './Button';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 function SendMsg() {
     
     const[msg,SetMsg] = useState("");
+    const id = useSelector((state) => state.auth.userData._id);
+    console.log(id)
     const handelSubmit = () => {
-        axios.post("http://localhost:5000/api/lt/msg/sendMsg/690ba5067f86a9961483cd64",
+        axios.post(`http://localhost:5000/api/lt/msg/sendMsg/${id}`,
             {msg},
             { withCredentials: true }
         )

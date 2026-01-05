@@ -1,7 +1,9 @@
 import React,{useState,useEffect} from 'react'
 import axios from 'axios'
+import { useSelector, useDispatch } from 'react-redux'
 function UpdateProfile() {
   const [detail, setDetail] = useState({});
+  const dispatch = useDispatch()
 
   useEffect(() => {
     handelProfile()
@@ -13,7 +15,8 @@ function UpdateProfile() {
     )
       .then(res => {
         setDetail(res.data.data.user);
-        console.log(res.data.data.user)
+
+        // console.log(res.data.data.user)
       })
       .catch(() => {
         alert("Sorry Failed to Fetch Your Info")

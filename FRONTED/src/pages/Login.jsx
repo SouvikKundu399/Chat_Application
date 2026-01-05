@@ -2,9 +2,11 @@ import React, { useState } from 'react'
 import { nanoid } from 'nanoid'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
-
+import { login } from '../redux/auth/authSlice'
+import {useDispatch} from "react-redux"
 function Login() {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const handelOnSubmit = async (e) => {
         e.preventDefault();
         try {
@@ -13,6 +15,8 @@ function Login() {
                 { phoneNum: phone },
                 { withCredentials: true }
             );
+            dispatch(login(res.data.data.user))
+            console.log(res)
             alert("User Logged In Successfully!");
             navigate("/allcontacts")
         } catch (error) {
