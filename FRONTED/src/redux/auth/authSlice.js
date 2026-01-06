@@ -1,8 +1,12 @@
 import  {createSlice} from '@reduxjs/toolkit';
 
 const initialState = {
-    status : false,
-    userData : null
+    isLoggedIn : false,
+    userData : null,
+    isInChat : false,
+    memberData : null,
+    updatemsg : 0
+
 }
 
 const authSlice = createSlice({
@@ -10,15 +14,26 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         login: (state,action) => {
-            state.status = true;
+            state.isLoggedIn = true;
             state.userData = action.payload;
         },
         logout: (state) => {
-            state.status = false;
+            state.isLoggedIn = false;
             state.userData = null;
+        },
+        currentChat: (state,action) =>{
+            state.isInChat = true,
+            state.memberData = action.payload
+        },
+        leftChat: (state) => {
+            state.isInChat = false,
+            state.memberData = null
+        },
+        refreshAllChat: (state) => {
+            state.updatemsg += 1
         }
+
     }
 })
-export const {login,logout} = authSlice.actions;
-
+export const { login, logout, currentChat, leftChat, refreshAllChat } = authSlice.actions;
 export default authSlice.reducer

@@ -3,9 +3,12 @@ import Logout from '../components/Logout'
 import Profile from '../components/Profile'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { currentChat } from '../redux/auth/authSlice'
 
 function Home() {
   const [members, setMembers] = useState([])
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   useEffect(() => {
     axios.get("http://localhost:5000/api/lt/chat/getAllConnections",
@@ -17,8 +20,12 @@ function Home() {
       .catch(() => {
         alert("Loading Problem")
       })
-  }, []) // ✅ empty dependency
+  }, [])
   console.log(members)
+  const handelClick = (member) => {
+    dispatch(currentChat(member))
+    navigate(`/chat/${member._id}`)
+  }
 
   return (
     <>
@@ -29,7 +36,7 @@ function Home() {
     
       {members.map(member => (
         <div 
-          onClick={() => navigate(`/chat/${member._id}`)}
+          onClick={() => handelClick(member)}
         key={member._id}>
           <h1>{member.fullName}</h1>
           <h3>{member.phoneNum}</h3>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { nanoid } from 'nanoid'
 import axios from 'axios'
-import { useNavigate } from 'react-router-dom'
+import { Navigate, useNavigate } from 'react-router-dom'
 import { login } from '../redux/auth/authSlice'
 import {useDispatch} from "react-redux"
 function Login() {
@@ -42,6 +42,10 @@ function Login() {
                     Login
                 </button>
             </form>
+
+            <button
+                onClick={() => navigate("/registration")}
+            >Registration</button>
         </div>
     )
 }

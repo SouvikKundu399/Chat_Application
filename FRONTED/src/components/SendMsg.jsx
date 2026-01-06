@@ -1,35 +1,59 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Input from './Input'
-import Button from './Button';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { refreshAllChat } from '../redux/auth/authSlice';
 function SendMsg() {
     
-    const[msg,SetMsg] = useState("");
-    const id = useSelector((state) => state.auth.userData._id);
+  const [message, SetMessage] = useState("");
+    const id = useSelector((state) => state.auth.memberData._id);
     console.log(id)
-    const handelSubmit = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+  const handelSubmit = (e) => {
+      e.preventDefault()
+      console.log(id)
+      if (!id) {
+        alert("member not found")
+        return
+      }
+    if (!message) {
+      alert("Msg not found")
+      return
+    }
+
         axios.post(`http://localhost:5000/api/lt/msg/sendMsg/${id}`,
-            {msg},
+          { message },
             { withCredentials: true }
         )
-        .then(res => console.log("Msg send successfully"))
-        .catct(() => {
+        .then(() => {
+            SetMessage("")
+            // navigate(`/chat/${id}`)  
+            dispatch(refreshAllChat())
+
+          })
+        .catch(() => {
             alert("Piz send again")
         })
     }
-  return (
+
+  // useEffect(() => {
+    
+  // }, [message])
+    return (
     <div>
-      <form onSubmit={handelSubmit}>
+      <form onSubmit={(e) => handelSubmit(e)}>
         <Input
             type="text"
             placeholder="Enter your msg .."
-            value={msg}
-            onChange={(e) => (SetMsg(e.target.value))}
+          value={message}
+          onChange={(e) => (SetMessage(e.target.value))}
         />
-        <Button
-        type="Submit"
-        >send</Button>
+        <button
+        type="submit"
+        >send</button>
       </form>
     </div>
   )

@@ -15,7 +15,7 @@ messageRouter.route("/").post(
     getChatByUser
 )
 
-messageRouter.route("/sendMsg/:chatID").post(
+messageRouter.route("/sendMsg/:contactId").post(
     authentication,
     sendMsg
 )
@@ -25,12 +25,12 @@ messageRouter.route("/getMsg/:contactId").post(
     getMsg
 )
 
-messageRouter.route("/deleteMsg/:msgID").post(
+messageRouter.route("/deleteMsg/:msgID").delete(
     authentication,
     deleteMsg
 )
 
-messageRouter.route("/editMsg/:msgID").post(
+messageRouter.route("/editMsg/:msgID").put(
     authentication,
     editMsg
 )

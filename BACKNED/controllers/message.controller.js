@@ -5,14 +5,26 @@ import Message from "../models/message.model.js";
 import Chat from "../models/chats.model.js";
 
 const sendMsg = asyncHandeler(async(req,res) => {
-    const {chatID} = req.params
-    const {msg} = req.body
-    if(!chatID || ! msg){
-        throw new apiError(401,"ChatID or msg is missing")
+    const {contactId} = req.params
+    const {message : msg} = req.body
+    const id = contactId
+    console.log("Contact ID: ",contactId);
+    console.log("Message: ",msg);
+    const chat = await Chat.findOne({
+        members: { $all: [req.user._id, id] }
+    }).select("_id");
+    const chatId = chat?._id;
+    console.log("Chat ID: ",chatId);
+    if (!chatId) {
+        throw new apiError(501, "Chat ID was not found")
+    }
+    
+    if(!chatId || ! msg){
+        throw new apiError(401,"chatId or msg is missing")
     }
 
     const newMessage = await Message.create({
-        chatId : chatID,
+        chatId : chatId,
         senderId : req.user?._id,
         message : msg
     })

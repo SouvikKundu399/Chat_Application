@@ -48,69 +48,74 @@ function Registration() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div>
+      <form onSubmit={handleSubmit} className="space-y-4">
 
-      {/* Full Name */}
-      <label htmlFor={fullNameId}>Full Name</label>
-      <input
-        id={fullNameId}
-        type="text"
-        placeholder="Enter your full name"
-        value={formData.fullName}
-        onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-      />
+        {/* Full Name */}
+        <label htmlFor={fullNameId}>Full Name</label>
+        <input
+          id={fullNameId}
+          type="text"
+          placeholder="Enter your full name"
+          value={formData.fullName}
+          onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+        />
 
-      {/* Username */}
-      <label htmlFor={userNameId}>Username</label>
-      <input
-        id={userNameId}
-        type="text"
-        placeholder="Enter your username"
-        value={formData.userName}
-        onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
-      />
+        {/* Username */}
+        <label htmlFor={userNameId}>Username</label>
+        <input
+          id={userNameId}
+          type="text"
+          placeholder="Enter your username"
+          value={formData.userName}
+          onChange={(e) => setFormData({ ...formData, userName: e.target.value })}
+        />
 
-      {/* Email */}
-      <label htmlFor={emailId}>Email</label>
-      <input
-        id={emailId}
-        type="email"
-        placeholder="Enter your email"
-        value={formData.email}
-        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-      />
+        {/* Email */}
+        <label htmlFor={emailId}>Email</label>
+        <input
+          id={emailId}
+          type="email"
+          placeholder="Enter your email"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+        />
 
-      {/* Phone */}
-      <label htmlFor={phoneId}>Phone Number</label>
-      <input
-        id={phoneId}
-        type="text"
-        placeholder="Enter phone number"
-        value={formData.phone}
-        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-      />
+        {/* Phone */}
+        <label htmlFor={phoneId}>Phone Number</label>
+        <input
+          id={phoneId}
+          type="text"
+          placeholder="Enter phone number"
+          value={formData.phone}
+          onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+        />
 
-      {/* Description */}
-      <label htmlFor={descriptionId}>Description</label>
-      <input
-        id={descriptionId}
-        type="text"
-        placeholder="Something about you"
-        value={formData.description}
-        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-      />
+        {/* Description */}
+        <label htmlFor={descriptionId}>Description</label>
+        <input
+          id={descriptionId}
+          type="text"
+          placeholder="Something about you"
+          value={formData.description}
+          onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+        />
 
-      {/* Avatar */}
-      <label htmlFor={avatarId}>Upload Avatar</label>
-      <input
-        id={avatarId}
-        type="file"
-        accept="image/*"
-        onChange={(e) => setFormData({ ...formData, avatar: e.target.files[0] })}
-      />
+        {/* Avatar */}
+        <label htmlFor={avatarId}>Upload Avatar</label>
+        <input
+          id={avatarId}
+          type="file"
+          accept="image/*"
+          onChange={(e) => setFormData({ ...formData, avatar: e.target.files[0] })}
+        />
 
-      <button type="submit">Register</button>
-    </form>
+        <button type="submit">Register</button>
+      </form>
+      <hr />
+      <button onClick={() => navigate("/login")}>Login</button>
+    </div>
+    
   );
 }
 
