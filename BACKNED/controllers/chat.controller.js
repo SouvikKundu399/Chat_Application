@@ -10,9 +10,13 @@ const addChat = asyncHandeler(async(req,res) => {
     // serch user by phone number if exit 
     // create a new document of chat
     const {mobileNumber} = req.body
+    console.log("mobileNumber",mobileNumber);
     const isExit = await User.findOne({phoneNum : mobileNumber})
+    // if(!isExit){
+    //     sendOtp(mobileNumber,"Your friend is Inviting You to Join <<Our web Link>>")
+    //     throw new apiError(400,"User does not exit")
+    // }
     if(!isExit){
-        sendOtp(mobileNumber,"Your friend is Inviting You to Join <<Our web Link>>")
         throw new apiError(400,"User does not exit")
     }
 
@@ -49,9 +53,9 @@ const getAllConnections = asyncHandeler(async(req,res) => {
     }).populate("members","userName fullName avatar phoneNum mail description");
 
     console.log(typeof allConnections);
-    if(allConnections.length === 0){
-        throw new apiError(500,"Unable to fetch connections")
-    }   
+    // if(allConnections.length === 0){
+    //     throw new apiError(500,"Unable to fetch connections")
+    // }   
     let userConnections = [];
     let idx=0;
     allConnections.map((connection) => (connection.members.map((member) => {

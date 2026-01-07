@@ -5,6 +5,7 @@ import AllConnection from '../pages/AllConnection.jsx'
 import UpdateProfile from '../pages/UpdateProfile.jsx'
 import Chat from '../pages/Chat.jsx'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import AddNewContact from '../pages/AddNewContact.jsx'
 
 function UserRouter() {
     return (
@@ -16,6 +17,7 @@ function UserRouter() {
                 <Route path="/UpdateProfile" element={<UpdateProfile />} />
                 <Route path="/UpdateProfile" element={<UpdateProfile />} />
                 <Route path="/chat/:id" element={<Chat />} />
+                <Route path="/addNewContact" element={<AddNewContact />} />
                 
             </Routes>
         </Router>

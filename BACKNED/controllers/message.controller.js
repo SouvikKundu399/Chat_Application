@@ -59,9 +59,7 @@ const getMsg = asyncHandeler(async(req,res) => {
     console.log("Chat ID: ",chatId);
     const allMsg = await Message.find({ chatId });
     console.log("All Messages: ",allMsg);
-    if(!allMsg.length){
-        throw new apiError(400,"No MSG found")
-    }
+    
 
     return res
     .status(200)

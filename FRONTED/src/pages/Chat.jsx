@@ -13,6 +13,7 @@ function Chat() {
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState("")
   const memberName = useSelector((state) => state.auth.memberData.fullName)
+  const currentUserId = useSelector((state) => state.auth.userData._id)
   const navigate = useNavigate();
 
   const handelChat = (id) => {
@@ -81,6 +82,8 @@ function Chat() {
       {allChat.map((chat) => (
         <div key={chat._id}>
           <hr />
+
+
           {editingId === chat._id ? (
             <>
               <input
@@ -93,6 +96,9 @@ function Chat() {
             </>
           ) : (
             <>
+              {
+                  chat.senderId === currentUserId ? <h4>You</h4> : <h4>{memberName}</h4>
+              }
               <h3>{chat.message}</h3>
               <p>{chat.date}</p>
               <p>{chat.time}</p>

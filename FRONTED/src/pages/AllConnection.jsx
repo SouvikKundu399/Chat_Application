@@ -32,6 +32,9 @@ function Home() {
     <hr />
       <Logout />
       <Profile />
+      <button
+      onClick={() => navigate("/addNewContact")}
+      >Add New Contact</button>
       <hr />
     
       {members.map(member => (
