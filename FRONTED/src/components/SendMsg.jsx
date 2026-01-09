@@ -1,61 +1,72 @@
-import React, { useEffect, useState } from 'react'
-import Input from './Input'
-import axios from 'axios';
-import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { refreshAllChat } from '../redux/auth/authSlice';
+import React, { useState } from 'react'
+import axios from 'axios'
+import { useSelector, useDispatch } from 'react-redux'
+import { refreshAllChat } from '../redux/auth/authSlice'
+
 function SendMsg() {
-    
-  const [message, SetMessage] = useState("");
-    const id = useSelector((state) => state.auth.memberData._id);
-    console.log(id)
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-  const handelSubmit = (e) => {
-      e.preventDefault()
-      console.log(id)
-      if (!id) {
-        alert("member not found")
-        return
-      }
-    if (!message) {
-      alert("Msg not found")
+  const [message, setMessage] = useState("")
+  const dispatch = useDispatch()
+
+  const id = useSelector((state) => state.auth.memberData._id)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    if (!id) {
+      alert("Member not found")
       return
     }
 
-        axios.post(`http://localhost:5000/api/lt/msg/sendMsg/${id}`,
-          { message },
-            { withCredentials: true }
-        )
-        .then(() => {
-            SetMessage("")
-            // navigate(`/chat/${id}`)  
-            dispatch(refreshAllChat())
-
-          })
-        .catch(() => {
-            alert("Piz send again")
-        })
+    if (!message.trim()) {
+      return
     }
 
-  // useEffect(() => {
-    
-  // }, [message])
-    return (
-    <div>
-      <form onSubmit={(e) => handelSubmit(e)}>
-        <Input
-            type="text"
-            placeholder="Enter your msg .."
-          value={message}
-          onChange={(e) => (SetMessage(e.target.value))}
-        />
-        <button
+    axios.post(
+      `http://localhost:5000/api/lt/msg/sendMsg/${id}`,
+      { message },
+      { withCredentials: true }
+    )
+      .then(() => {
+        setMessage("")
+        dispatch(refreshAllChat())
+      })
+      .catch(() => {
+        alert("Please send again")
+      })
+  }
+
+  return (
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center gap-2 w-full"
+    >
+      {/* Input */}
+      <input
+        type="text"
+        placeholder="Type a message"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        className="
+          flex-1 px-4 py-2.5 
+          rounded-full border border-gray-300 
+          focus:outline-none focus:ring-1 focus:ring-green-500
+          text-sm
+        "
+      />
+
+      {/* Send Button */}
+      <button
         type="submit"
-        >send</button>
-      </form>
-    </div>
+        className="
+          px-4 py-2.5 rounded-full 
+          bg-green-600 text-white 
+          font-semibold text-sm
+          hover:bg-green-700 transition
+        "
+      >
+        Send
+      </button>
+    </form>
   )
 }
 
