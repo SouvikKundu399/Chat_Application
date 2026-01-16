@@ -41,45 +41,31 @@ const getMsg = async(currentUserId,memberId) => {
     }
     console.log("Chat ID: ",chatId);
     const allMsg = await Message.find({ chatId });
-    console.log("All Messages: ",allMsg);
+    // console.log("All Messages: ",allMsg);
     
 
     return allMsg;
 }
 
-const deleteMsg = asyncHandeler(async(req,res) => {
-    const {msgID} = req.params
-    console.log(msgID);
-    if (!msgID){
+const deleteMsg = async(msgId) => {
+    if (!msgId){
         throw new apiError(404,"Message ID was not found")
     }
-    const deletedMsg =  await Message.deleteOne({_id: msgID})
-    console.log(deletedMsg);
+    const deletedMsg =  await Message.deleteOne({_id: msgId})
+    // console.log(deletedMsg);
     if (!deletedMsg.deletedCount){
         throw new apiError(500,"Message deletion unsuccessful")
     }
+    return deletedMsg
+}
 
-    return res
-    .status(200)
-    .json(
-        new apiResponse(
-            200,
-            "Message deleted successfully",
-            deletedMsg,
-            req.originalUrl
-        )
-    );
-})
-
-const editMsg = asyncHandeler(async(req,res) => {
-    const {msgID} = req.params
-    const {newMsg} = req.body
+const editMsg = async (msgID, newMsg, currentUserId) => {
     if (!msgID || !newMsg){
         throw new apiError(501,"Message ID or newMsg was not found")
     }
     console.log(msgID,newMsg);
     const updatedMsg = await Message.findOneAndUpdate(
-        { _id: msgID, senderId: req.user._id },
+        { _id: msgID, senderId: currentUserId },
         {
             message: newMsg,
             updatedAt: new Date() 
@@ -90,17 +76,8 @@ const editMsg = asyncHandeler(async(req,res) => {
     if(!updatedMsg){
         throw new apiError(500,"Message update unsuccessful")
     }
-    return res
-    .status(200)
-    .json(
-        new apiResponse(
-            200,
-            "Message updated successfully",
-            updatedMsg,
-            req.originalUrl
-        )
-    );
-})
+    return updatedMsg
+}
 
 const getChatByUser = asyncHandeler(async(req,res) => {
     const userId = req.user?._id

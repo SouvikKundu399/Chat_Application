@@ -42,12 +42,19 @@ function Chat() {
 
   
   const handelDelete = (msgId) => {
-    axios.delete(
-      `http://localhost:5000/api/lt/msg/deleteMsg/${msgId}`,
-      { withCredentials: true }
-    )
-      .then(() => console.log("Deleted Successfully"))
-      .catch(() => alert("Sorry Failed to Delete Your Msg"))
+    // axios.delete(
+    //   `http://localhost:5000/api/lt/msg/deleteMsg/${msgId}`,
+    //   { withCredentials: true }
+    // )
+    //   .then(() => console.log("Deleted Successfully"))
+    //   .catch(() => alert("Sorry Failed to Delete Your Msg"))
+    socket.emit("delete-message", { msgId, roomId })
+    socket.on("deleted-msgId", (deletedMsgId) => {
+      setAllChat(prevMsg => (
+        prevMsg.filter((msg) => msg._id !== deletedMsgId)
+      ))
+      
+    })
   }
 
   const handelUpdateClick = (chat) => {
@@ -58,16 +65,23 @@ function Chat() {
   const handelUpdateSubmit = (msgId) => {
     if (!editText.trim()) return
 
-    axios.put(
-      `http://localhost:5000/api/lt/msg/editMsg/${msgId}`,
-      { newMsg: editText },
-      { withCredentials: true }
-    )
-      .then(() => {
-        setEditingId(null)
-        setEditText("")
-      })
-      .catch(() => alert("Sorry Failed to Update Your Msg"))
+    // axios.put(
+    //   `http://localhost:5000/api/lt/msg/editMsg/${msgId}`,
+    //   { newMsg: editText },
+    //   { withCredentials: true }
+    // )
+    //   .then(() => {
+    //     setEditingId(null)
+    //     setEditText("")
+    //   })
+    //   .catch(() => alert("Sorry Failed to Update Your Msg"))
+
+    socket.emit("edit-msg", ({ editingId, editText, roomId }))
+    setAllChat(prevMsg => (
+      prevMsg.map((msg) => (msg._id === editingId ? { ...msg, message: editText } : msg))
+    ))
+    setEditingId(null)
+    setEditText("")
   }
 
   const handelCancel = () => {
