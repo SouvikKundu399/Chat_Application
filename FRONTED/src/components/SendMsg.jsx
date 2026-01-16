@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux'
-import { refreshAllChat } from '../redux/auth/authSlice'
+import {socket} from '../socket'
 
-function SendMsg() {
+function SendMsg({roomId}) {
   const [message, setMessage] = useState("")
   const dispatch = useDispatch()
 
   const id = useSelector((state) => state.auth.memberData._id)
+  const currentuserID = useSelector((state) => state.auth.userData._id)
+
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -21,18 +23,27 @@ function SendMsg() {
       return
     }
 
-    axios.post(
-      `http://localhost:5000/api/lt/msg/sendMsg/${id}`,
-      { message },
-      { withCredentials: true }
-    )
-      .then(() => {
-        setMessage("")
-        dispatch(refreshAllChat())
-      })
-      .catch(() => {
-        alert("Please send again")
-      })
+    // axios.post(
+    //   `http://localhost:5000/api/lt/msg/sendMsg/${id}`,
+    //   { message },
+    //   { withCredentials: true }
+    // )
+    //   .then(() => {
+
+    //     setMessage("")
+    //   })
+    //   .catch(() => {
+    //     alert("Please send again")
+    //   })
+
+    socket.emit("send-message", {
+      currentuserID,
+      contactId: id,
+      message: message,
+      roomId
+    });
+    setMessage("")
+   
   }
 
   return (

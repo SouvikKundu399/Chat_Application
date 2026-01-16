@@ -4,14 +4,11 @@ import apiResponse from "../utils/apiResponse.utils.js";
 import Message from "../models/message.model.js";
 import Chat from "../models/chats.model.js";
 
-const sendMsg = asyncHandeler(async(req,res) => {
-    const {contactId} = req.params
-    const {message : msg} = req.body
-    const id = contactId
+const sendMsg = async (currentuserID, contactId, message) => {
     console.log("Contact ID: ",contactId);
-    console.log("Message: ",msg);
+    console.log("Message: ",message);
     const chat = await Chat.findOne({
-        members: { $all: [req.user._id, id] }
+        members: { $all: [currentuserID, contactId] }
     }).select("_id");
     const chatId = chat?._id;
     console.log("Chat ID: ",chatId);
@@ -19,39 +16,25 @@ const sendMsg = asyncHandeler(async(req,res) => {
         throw new apiError(501, "Chat ID was not found")
     }
     
-    if(!chatId || ! msg){
+    if (!chatId || !message){
         throw new apiError(401,"chatId or msg is missing")
     }
 
     const newMessage = await Message.create({
-        chatId : chatId,
-        senderId : req.user?._id,
-        message : msg
+        chatId,
+        senderId : currentuserID,
+        message
     })
     console.log("New Message: ",newMessage);
     if(!newMessage){
         throw new apiError(500,"Sending Message is unsuccessful")
     }
+    return newMessage;
+}
 
-    return res
-    .status(200)
-    .json(
-        new apiResponse(
-            200,
-            "Message sent successfully",
-            newMessage,
-            
-        )
-    );
-})
-
-const getMsg = asyncHandeler(async(req,res) => {
-    const {contactId} = req.params
-    if(!contactId){
-        throw new apiError(501,"Contact ID was not found")
-    }
+const getMsg = async(currentUserId,memberId) => {
     const chatId = await Chat.findOne({
-        members: { $all: [req.user._id, contactId] }
+        members: { $all: [currentUserId, memberId] }
     }).select("_id");
     if (!chatId) {
         throw new apiError(501, "Chat ID was not found")
@@ -61,17 +44,8 @@ const getMsg = asyncHandeler(async(req,res) => {
     console.log("All Messages: ",allMsg);
     
 
-    return res
-    .status(200)
-    .json(
-        new apiResponse(
-            200,
-            "All Messages fetched successfully",
-            allMsg,
-            req.originalUrl
-        )
-    );
-})
+    return allMsg;
+}
 
 const deleteMsg = asyncHandeler(async(req,res) => {
     const {msgID} = req.params

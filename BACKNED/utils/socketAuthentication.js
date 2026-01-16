@@ -1,0 +1,1 @@
+// const socketAuthentication = async (socket, currentUserId) => {

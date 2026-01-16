@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom"
 import axios from 'axios'
 import SendMsg from '../components/SendMsg'
 import { useSelector } from 'react-redux'
+import {socket} from '../socket'
+
 
 function Chat() {
   const { id } = useParams()
@@ -12,30 +14,39 @@ function Chat() {
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState("")
 
-  const updateAllChat = useSelector((state) => state.auth.updatemsg)
-  const memberName = useSelector((state) => state.auth.memberData.fullName)
-  const currentUserId = useSelector((state) => state.auth.userData._id)
-
-  const handelChat = (id) => {
-    axios.post(
-      `http://localhost:5000/api/lt/msg/getMsg/${id}`,
-      {},
-      { withCredentials: true }
-    )
-      .then(res => setAllChat(res.data.message))
-      .catch(() => alert("Sorry Failed to Fetch Your Info"))
+  const generateRoomId = (id1, id2) => {
+    return [id1, id2].sort().join("_")
   }
+  const memberName = useSelector((state) => state.auth.memberData?.fullName)
+  const memberId = useSelector((state) => state.auth.memberData?._id)
+  const currentUserId = useSelector((state) => state.auth.userData._id)
+  const roomId = generateRoomId(currentUserId, memberId)
+
 
   useEffect(() => {
-    handelChat(id)
-  }, [id, updateAllChat])
+    socket.emit("join-room", roomId);
+    socket.emit("connected-user-info", { currentUserId, memberId })
 
+    const handleAllMsg = (chat) => setAllChat(chat)
+    const handleNewMsg = (newMsg) => setAllChat(prev => [...prev, newMsg])
+
+    socket.on("get-all-msg", handleAllMsg)
+    socket.on("new-message", handleNewMsg)
+
+    return () => {
+      socket.off("get-all-msg", handleAllMsg)
+      socket.off("new-message", handleNewMsg)
+    }
+  }, [id, currentUserId, memberId])
+
+
+  
   const handelDelete = (msgId) => {
     axios.delete(
       `http://localhost:5000/api/lt/msg/deleteMsg/${msgId}`,
       { withCredentials: true }
     )
-      .then(() => handelChat(id))
+      .then(() => console.log("Deleted Successfully"))
       .catch(() => alert("Sorry Failed to Delete Your Msg"))
   }
 
@@ -55,7 +66,6 @@ function Chat() {
       .then(() => {
         setEditingId(null)
         setEditText("")
-        handelChat(id)
       })
       .catch(() => alert("Sorry Failed to Update Your Msg"))
   }
@@ -105,7 +115,7 @@ function Chat() {
 
       {/* ================= CHAT AREA ================= */}
       <div className="flex-1 w-full overflow-y-auto px-3 py-3 space-y-2">
-
+      {console.log("Rendering allChat:", allChat)}
         {allChat.map((chat, index) => {
           const isMe = chat.senderId === currentUserId
           const currentDate = chat.date
@@ -228,7 +238,7 @@ function Chat() {
 
       {/* ================= INPUT BAR ================= */}
       <div className="w-full bg-white px-2 py-2 border-t">
-        <SendMsg />
+        <SendMsg roomId={roomId} />
       </div>
 
     </div>

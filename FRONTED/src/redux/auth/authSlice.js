@@ -5,7 +5,6 @@ const initialState = {
     userData : null,
     isInChat : false,
     memberData : null,
-    updatemsg : 0
 
 }
 
@@ -29,11 +28,9 @@ const authSlice = createSlice({
             state.isInChat = false,
             state.memberData = null
         },
-        refreshAllChat: (state) => {
-            state.updatemsg += 1
-        }
+        
 
     }
 })
-export const { login, logout, currentChat, leftChat, refreshAllChat } = authSlice.actions;
+export const { login, logout, currentChat, leftChat } = authSlice.actions;
 export default authSlice.reducer

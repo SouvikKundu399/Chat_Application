@@ -1,11 +1,12 @@
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
+
 const app = express();
 
 app.use(cors({
     origin: "http://localhost:5173",
-    methods: "GET,POST,PUT,DELETE",
+    methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true
 }));
 
@@ -26,6 +27,5 @@ app.use("/api/lt/user", userRoute)
 app.use("/api/lt/msg", messageRouter)
 app.use("/api/lt/chat", chatRouter)
 
-export {app}
-
+export { app };
 
