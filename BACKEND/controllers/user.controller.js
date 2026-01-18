@@ -116,17 +116,6 @@ const logIn = asyncHandeler(async (req, res) => {
 })
 
 const logOut = asyncHandeler(async (req, res) => {
-    await User.findByIdAndUpdate(
-        req.user._id,
-        {
-            $unset: {
-                currentUserId: 1
-            }
-        },
-        {
-            new: true
-        }
-    )
     const options = {
         httpOnly: true,
         sameSite: "lax",
@@ -134,7 +123,7 @@ const logOut = asyncHandeler(async (req, res) => {
     }
     return res
         .status(200)
-        .cookie("currentUserId", "", options)
+        .clearCookie("currentUserId",options)
         .json(
             new apiResponse(
                 200,

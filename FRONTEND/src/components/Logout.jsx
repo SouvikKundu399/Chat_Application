@@ -3,6 +3,7 @@ import axios from 'axios'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { logout } from '../redux/auth/authSlice'
+import { socket } from '../socket'
 
 function Logout() {
     const navigate = useNavigate()
@@ -16,7 +17,7 @@ function Logout() {
                 {},
                 { withCredentials: true }
             )
-
+            socket.disconnect();
             dispatch(logout())
             navigate("/login")
         } catch {

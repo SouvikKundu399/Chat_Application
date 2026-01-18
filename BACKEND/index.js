@@ -26,46 +26,69 @@ io.use(socketAuth)
 
 // socket io connection
 io.on("connection", (socket) => {
-    socket.on("join-room", (room) => {
-        socket.join(room);
-        console.log(`User joined room: ${room}`);
+    socket.on("join-room", (roomId) => {
+        socket.join(roomId);
+        console.log(`User joined roomId: ${roomId}`);
     });
 
-    socket.on("connected-user-info", async({ currentUserId,memberId}) => {
-        // console.log("User connected:", currentUserId, memberId);
-
-        const allMsg = await getMsg(currentUserId, memberId);
-        // console.log("All Messages to send:", allMsg);
-        socket.emit("get-all-msg", allMsg);
-    })
-    socket.on("send-message", async ({ currentuserID, contactId, message, roomId }) => {
+    socket.on("connected-user-info", async(chatId) => {
         try {
-            const newMessage = await sendMsg(currentuserID, contactId, message);
-            // console.log("roomId", roomId);
+            console.log("ChatId :", chatId);
+
+            const allMsg = await getMsg(chatId);
+            console.log("All Messages to send:", allMsg);
+            socket.emit("get-all-msg", allMsg);
+        } catch (err) {
+            console.error("Get messages error:", err);
+            socket.emit("error", "Failed to get messages");
+        }
+    })
+    socket.on("send-message", async ({ chatId, message, roomId }) => {
+        try {
+            const currentUserId = socket.user?._id
+            console.log("roomId", roomId);
+            const newMessage = await sendMsg(currentUserId,chatId, message);
+            console.log(newMessage)
             io.to(roomId).emit("new-message", newMessage);
         } catch (err) {
             console.error("Send message error:", err);
+            socket.emit("error", "Failed to send message");
         }
     });
     socket.on("delete-message", async({msgId,roomId}) =>{
-        const deleteMessage = await deleteMsg(msgId)
-        if (deleteMessage) {
-            io.to(roomId).emit("deleted-msgId",msgId)
+        try {
+            const deleteMessage = await deleteMsg(msgId)
+            if (deleteMessage) {
+                io.to(roomId).emit("deleted-msgId",msgId)
+            }
+        } catch (err) {
+            console.error("Delete message error:", err);
+            socket.emit("error", "Failed to delete message");
         }
     })
 
     socket.on("edit-msg", async ({ editingId: msgID, editText: newMsg, roomId }) => {
-        const currentUserId = socket.user?._id
-        const editMessage = await editMsg(msgID, newMsg, currentUserId)
-        console.log("editedMsg : ", editMessage)
-        io.to(roomId).emit("updated-msg",editMessage)
+        try {
+            const currentUserId = socket.user?._id
+            console.log(msgID +" "+newMsg+ " "+roomId)
+            console.log(currentUserId)
+            const editMessage = await editMsg(msgID, newMsg, currentUserId)
+            console.log("editedMsg : ", editMessage)
+            io.to(roomId).emit("updated-msg",{editMessage,msgID})
+        } catch (err) {
+            console.error("Edit message error:", err);
+            socket.emit("error", "Failed to edit message");
+        }
     })
+    socket.on("leave-room", (roomId) => {
+        socket.leave(roomId);
+    });
 
 });
 
 connectDB()
     .then(() => {
-        server.listen(process.env.PORT || 500, () => {
+        server.listen(process.env.PORT || 5000, () => {
             console.log("Server is created")
         })
     })

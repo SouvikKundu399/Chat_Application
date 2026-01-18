@@ -3,44 +3,70 @@ import { useParams, useNavigate } from "react-router-dom"
 import axios from 'axios'
 import SendMsg from '../components/SendMsg'
 import { useSelector } from 'react-redux'
-import {socket} from '../socket'
+import { socket } from '../socket'
 
 
 function Chat() {
-  const { id } = useParams()
+  const { id : chatId } = useParams()
   const navigate = useNavigate()
 
   const [allChat, setAllChat] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [editText, setEditText] = useState("")
 
-  const generateRoomId = (id1, id2) => {
-    return [id1, id2].sort().join("_")
-  }
-  const memberName = useSelector((state) => state.auth.memberData?.fullName)
-  const memberId = useSelector((state) => state.auth.memberData?._id)
+  const generateRoomId = (chatId) => chatId
+
+  const memberName = useSelector((state) => state.auth.memberData?.user.fullName)
+
   const currentUserId = useSelector((state) => state.auth.userData._id)
-  const roomId = generateRoomId(currentUserId, memberId)
+  const roomId = generateRoomId(chatId)
 
 
   useEffect(() => {
-    socket.emit("join-room", roomId);
-    socket.emit("connected-user-info", { currentUserId, memberId })
-
-    const handleAllMsg = (chat) => setAllChat(chat)
+    console.log(1)
+    const handleAllMsg = (chat) => {
+      console.log("handelAllMsg")
+      setAllChat(chat)
+    }
     const handleNewMsg = (newMsg) => setAllChat(prev => [...prev, newMsg])
+    const handelDeleteMsg =  (deletedMsgId) => {
+      setAllChat(prevMsg => (
+        prevMsg.filter((msg) => msg._id !== deletedMsgId)
+      ))
+    }
+    const handleUpdateMsg = ({editMessage,msgID}) => {
+      console.log("editedmsg ",editMessage)
+      setAllChat((prevMsg) =>
+        prevMsg.map((msg) =>
+          msg._id === msgID
+            ? editMessage
+            : msg
+        )
+      );
+      setEditingId(null)
+      setEditText("")
+    };
+
 
     socket.on("get-all-msg", handleAllMsg)
     socket.on("new-message", handleNewMsg)
+    socket.on("deleted-msgId", handelDeleteMsg)
+    socket.on("updated-msg", handleUpdateMsg)
 
+    socket.emit("join-room", roomId);
+    // console.log("chatId", chatId)
+    socket.emit("connected-user-info", chatId)
     return () => {
+      socket.emit("leave-room", chatId);
       socket.off("get-all-msg", handleAllMsg)
       socket.off("new-message", handleNewMsg)
+      socket.off("deleted-msgId", handelDeleteMsg)
+      socket.off("updated-msg", handleUpdateMsg)
     }
-  }, [id, currentUserId, memberId])
+  }, [chatId])
 
 
-  
+
   const handelDelete = (msgId) => {
     // axios.delete(
     //   `http://localhost:5000/api/lt/msg/deleteMsg/${msgId}`,
@@ -49,12 +75,6 @@ function Chat() {
     //   .then(() => console.log("Deleted Successfully"))
     //   .catch(() => alert("Sorry Failed to Delete Your Msg"))
     socket.emit("delete-message", { msgId, roomId })
-    socket.on("deleted-msgId", (deletedMsgId) => {
-      setAllChat(prevMsg => (
-        prevMsg.filter((msg) => msg._id !== deletedMsgId)
-      ))
-      
-    })
   }
 
   const handelUpdateClick = (chat) => {
@@ -66,7 +86,7 @@ function Chat() {
     if (!editText.trim()) return
 
     // axios.put(
-    //   `http://localhost:5000/api/lt/msg/editMsg/${msgId}`,
+    //   `http://localhost:50 00/api/lt/msg/editMsg/${msgId}`,
     //   { newMsg: editText },
     //   { withCredentials: true }
     // )
@@ -75,13 +95,8 @@ function Chat() {
     //     setEditText("")
     //   })
     //   .catch(() => alert("Sorry Failed to Update Your Msg"))
-
+    // console.log("Submit Button Clicked")
     socket.emit("edit-msg", ({ editingId, editText, roomId }))
-    setAllChat(prevMsg => (
-      prevMsg.map((msg) => (msg._id === editingId ? { ...msg, message: editText } : msg))
-    ))
-    setEditingId(null)
-    setEditText("")
   }
 
   const handelCancel = () => {
@@ -129,7 +144,7 @@ function Chat() {
 
       {/* ================= CHAT AREA ================= */}
       <div className="flex-1 w-full overflow-y-auto px-3 py-3 space-y-2">
-      {console.log("Rendering allChat:", allChat)}
+        {console.log("Rendering allChat:", allChat)}
         {allChat.map((chat, index) => {
           const isMe = chat.senderId === currentUserId
           const currentDate = chat.date
@@ -252,7 +267,10 @@ function Chat() {
 
       {/* ================= INPUT BAR ================= */}
       <div className="w-full bg-white px-2 py-2 border-t">
-        <SendMsg roomId={roomId} />
+        <SendMsg 
+        roomId={roomId}
+        chatId={chatId}
+         />
       </div>
 
     </div>

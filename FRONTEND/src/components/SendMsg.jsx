@@ -2,19 +2,17 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { useSelector, useDispatch } from 'react-redux'
 import {socket} from '../socket'
+import { useEffect } from 'react'
 
-function SendMsg({roomId}) {
+function SendMsg({roomId,chatId}) {
   const [message, setMessage] = useState("")
   const dispatch = useDispatch()
-
-  const id = useSelector((state) => state.auth.memberData._id)
-  const currentuserID = useSelector((state) => state.auth.userData._id)
 
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    if (!id) {
+    if (!chatId) {
       alert("Member not found")
       return
     }
@@ -37,8 +35,7 @@ function SendMsg({roomId}) {
     //   })
 
     socket.emit("send-message", {
-      currentuserID,
-      contactId: id,
+      chatId,
       message: message,
       roomId
     });

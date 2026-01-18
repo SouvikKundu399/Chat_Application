@@ -4,14 +4,7 @@ import apiResponse from "../utils/apiResponse.utils.js";
 import Message from "../models/message.model.js";
 import Chat from "../models/chats.model.js";
 
-const sendMsg = async (currentuserID, contactId, message) => {
-    console.log("Contact ID: ",contactId);
-    console.log("Message: ",message);
-    const chat = await Chat.findOne({
-        members: { $all: [currentuserID, contactId] }
-    }).select("_id");
-    const chatId = chat?._id;
-    console.log("Chat ID: ",chatId);
+const sendMsg = async (currentUserId,chatId, message) => {
     if (!chatId) {
         throw new apiError(501, "Chat ID was not found")
     }
@@ -22,7 +15,7 @@ const sendMsg = async (currentuserID, contactId, message) => {
 
     const newMessage = await Message.create({
         chatId,
-        senderId : currentuserID,
+        senderId: currentUserId,
         message
     })
     console.log("New Message: ",newMessage);
@@ -32,10 +25,7 @@ const sendMsg = async (currentuserID, contactId, message) => {
     return newMessage;
 }
 
-const getMsg = async(currentUserId,memberId) => {
-    const chatId = await Chat.findOne({
-        members: { $all: [currentUserId, memberId] }
-    }).select("_id");
+const getMsg = async (chatId) => {
     if (!chatId) {
         throw new apiError(501, "Chat ID was not found")
     }
@@ -43,7 +33,6 @@ const getMsg = async(currentUserId,memberId) => {
     const allMsg = await Message.find({ chatId });
     // console.log("All Messages: ",allMsg);
     
-
     return allMsg;
 }
 
@@ -60,8 +49,8 @@ const deleteMsg = async(msgId) => {
 }
 
 const editMsg = async (msgID, newMsg, currentUserId) => {
-    if (!msgID || !newMsg){
-        throw new apiError(501,"Message ID or newMsg was not found")
+    if (!msgID || !newMsg || !currentUserId){
+        throw new apiError(501,"Message ID or newMsg or currentUser was not found")
     }
     console.log(msgID,newMsg);
     const updatedMsg = await Message.findOneAndUpdate(

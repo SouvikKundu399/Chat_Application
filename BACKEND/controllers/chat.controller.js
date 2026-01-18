@@ -60,7 +60,10 @@ const getAllConnections = asyncHandeler(async(req,res) => {
     let idx=0;
     allConnections.map((connection) => (connection.members.map((member) => {
         if(member._id.toString() !== req.user?._id.toString()){
-            userConnections[idx++] = member;
+            userConnections[idx++] = {
+                user : member,
+                chatId : connection._id
+            };
         }
     })));
 
