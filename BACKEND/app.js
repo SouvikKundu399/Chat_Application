@@ -27,5 +27,11 @@ app.use("/api/lt/user", userRoute)
 app.use("/api/lt/msg", messageRouter)
 app.use("/api/lt/chat", chatRouter)
 
+// Global error handler
+app.use((err, req, res, next) => {
+    console.error('Global error:', err);
+    res.status(500).json({ message: 'Internal server error' });
+});
+
 export { app };
 

@@ -35,7 +35,7 @@ function Registration() {
 
     try {
       await axios.post(
-        "http://localhost:5000/api/lt/user/registration",
+        "http://localhost:8000/api/lt/user/registration",
         data,
         { withCredentials: true }
       )

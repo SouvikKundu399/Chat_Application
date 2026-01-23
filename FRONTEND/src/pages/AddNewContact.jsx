@@ -10,7 +10,7 @@ function AddNewContact() {
     e.preventDefault()
 
     axios.post(
-      "http://localhost:5000/api/lt/chat/addChat",
+      "http://localhost:8000/api/lt/chat/addChat",
       { mobileNumber: phoneNum },
       { withCredentials: true }
     )

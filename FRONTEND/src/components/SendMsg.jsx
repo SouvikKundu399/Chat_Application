@@ -34,12 +34,17 @@ function SendMsg({roomId,chatId}) {
     //     alert("Please send again")
     //   })
 
-    socket.emit("send-message", {
-      chatId,
-      message: message,
-      roomId
-    });
-    setMessage("")
+    try {
+        socket.emit("send-message", {
+            chatId,
+            message,
+            roomId
+        });
+        setMessage("")
+    } catch (error) {
+        console.error('Error sending message:', error);
+        alert("Failed to send message");
+    }
    
   }
 

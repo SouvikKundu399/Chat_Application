@@ -11,7 +11,7 @@ function UpdateProfile() {
   }, [])
 
   const handleProfile = () => {
-    axios.get("http://localhost:5000/api/lt/user/getUser", {
+    axios.get("http://localhost:8000/api/lt/user/getUser", {
       withCredentials: true
     })
       .then(res => {
@@ -26,7 +26,7 @@ function UpdateProfile() {
     e.preventDefault()
 
     axios.put(
-      "http://localhost:5000/api/lt/user/update",
+      "http://localhost:8000/api/lt/user/update",
       detail,
       { withCredentials: true }
     )

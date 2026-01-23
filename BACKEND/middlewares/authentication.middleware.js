@@ -7,15 +7,15 @@ const authentication = asyncHandeler(async(req,res,next) => {
     try {
         // console.log("Cookies: ", req);
         const userId = req.cookies?.currentUserId || req.heasders?.authorization?.split(" ")[1];
-        console.log("authentication middleware called");
-        console.log("userId: ", userId);
-        console.log("req.body:", req.body);
+        // console.log("authentication middleware called");
+        // console.log("userId: ", userId);
+        // console.log("req.body:", req.body);
         if (!userId){
             throw new apiError(401,"user must be loggedIn")
         }
     
         const user = await User.findById(userId)
-        console.log("user: ", user);
+        // console.log("user: ", user);
         if (!user) {
             throw new apiError(501, "no user found")
         }

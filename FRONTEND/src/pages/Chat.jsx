@@ -23,48 +23,74 @@ function Chat() {
 
 
   useEffect(() => {
-    console.log(1)
-    const handleAllMsg = (chat) => {
-      console.log("handelAllMsg")
-      setAllChat(chat)
+    console.log("Error in Chat 1 ")
+    // const handleAllMsg = (chat) => {
+    //   console.log("Error in handleAllMsg 1 ")
+    //   // console.log("handelAllMsg")
+    //   console.log(chat)
+    //   setAllChat(chat)
+    // }
+    const handleNewMsg = (newMsg) => {
+      try {
+        setAllChat(prev => [...prev, newMsg])
+      } catch (error) {
+        console.error('Error handling new message:', error);
+      }
     }
-    const handleNewMsg = (newMsg) => setAllChat(prev => [...prev, newMsg])
     const handelDeleteMsg =  (deletedMsgId) => {
-      setAllChat(prevMsg => (
-        prevMsg.filter((msg) => msg._id !== deletedMsgId)
-      ))
+      try {
+        setAllChat(prevMsg => (
+          prevMsg.filter((msg) => msg._id !== deletedMsgId)
+        ))
+      } catch (error) {
+        console.error('Error handling delete message:', error);
+      }
     }
     const handleUpdateMsg = ({editMessage,msgID}) => {
-      console.log("editedmsg ",editMessage)
-      setAllChat((prevMsg) =>
-        prevMsg.map((msg) =>
-          msg._id === msgID
-            ? editMessage
-            : msg
-        )
-      );
-      setEditingId(null)
-      setEditText("")
+      try {
+        console.log("editedmsg ",editMessage)
+        setAllChat((prevMsg) =>
+          prevMsg.map((msg) =>
+            msg._id === msgID
+              ? editMessage
+              : msg
+          )
+        );
+        setEditingId(null)
+        setEditText("")
+      } catch (error) {
+        console.error('Error handling update message:', error);
+      }
     };
 
 
-    socket.on("get-all-msg", handleAllMsg)
+    socket.emit("join-room", roomId);
+    // socket.on("get-all-msg", handleAllMsg)
     socket.on("new-message", handleNewMsg)
     socket.on("deleted-msgId", handelDeleteMsg)
     socket.on("updated-msg", handleUpdateMsg)
-
-    socket.emit("join-room", roomId);
+    console.log("Error in Chat 2")
+    handelAllChat(chatId)
     // console.log("chatId", chatId)
     socket.emit("connected-user-info", chatId)
     return () => {
-      socket.emit("leave-room", chatId);
-      socket.off("get-all-msg", handleAllMsg)
+      socket.emit("leave-room", roomId);
+      // socket.off("get-all-msg", handleAllMsg)
       socket.off("new-message", handleNewMsg)
       socket.off("deleted-msgId", handelDeleteMsg)
       socket.off("updated-msg", handleUpdateMsg)
     }
   }, [chatId])
 
+  const handelAllChat = (chatId) => {
+    axios.post(
+      `http://localhost:8000/api/lt/msg/getMsg/${chatId}`,
+      {},
+      { withCredentials: true }
+    )
+      .then(res => setAllChat(res.data.message))
+      .catch(() => alert("Sorry Failed to Fetch Your Info"))
+  }
 
 
   const handelDelete = (msgId) => {
@@ -96,7 +122,12 @@ function Chat() {
     //   })
     //   .catch(() => alert("Sorry Failed to Update Your Msg"))
     // console.log("Submit Button Clicked")
-    socket.emit("edit-msg", ({ editingId, editText, roomId }))
+    socket.emit("edit-msg", {
+      editingId,
+      editText,
+      roomId
+    })
+
   }
 
   const handelCancel = () => {
@@ -144,9 +175,9 @@ function Chat() {
 
       {/* ================= CHAT AREA ================= */}
       <div className="flex-1 w-full overflow-y-auto px-3 py-3 space-y-2">
-        {console.log("Rendering allChat:", allChat)}
+        {/* {console.log("Rendering allChat:", allChat)} */}
         {allChat.map((chat, index) => {
-          const isMe = chat.senderId === currentUserId
+          const isMe = String(chat.senderId) === String(currentUserId)
           const currentDate = chat.date
           const prevDate = index > 0 ? allChat[index - 1].date : null
           const showDateSeparator = currentDate !== prevDate

@@ -4,24 +4,36 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
 import { login } from '../redux/auth/authSlice'
 import { useDispatch } from "react-redux"
-
+import { socket } from '../socket'
+import { useEffect } from 'react'
 function Login() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
     const [phone, setPhone] = useState('')
     const phoneId = nanoid()
+    useEffect(() => {
+        socket.emit("say-hello")
+        socket.on("say-hi", () => {
+            try {
+                console.log("Hi-login")
+            } catch (error) {
+                console.error('Error in say-hi:', error);
+            }
+        })
+    },[])
 
     const handelOnSubmit = async (e) => {
         e.preventDefault()
         try {
             const res = await axios.post(
-                "http://localhost:5000/api/lt/user/login",
+                "http://localhost:8000/api/lt/user/login",
                 { phoneNum: phone },
                 { withCredentials: true }
             )
 
             dispatch(login(res.data.data.user))
+            socket.connect()
             alert("User Logged In Successfully!")
             navigate("/allcontacts")
 

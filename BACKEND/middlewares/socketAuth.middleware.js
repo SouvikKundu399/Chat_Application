@@ -2,35 +2,29 @@ import User from "../models/user.model.js";
 
 const socketAuth = async (socket, next) => {
     try {
-        console.log("socketAuth error" + 2)
+        console.log("Error In Auth 1")
         const cookieHeader = socket.handshake.headers.cookie;
-        // console.log("Socket Handshake Cookies:", cookieHeader);
-        // console.log("Socket Handshake hades :", socket.handshake.headers);
-        // console.log("Socket Handshake:", socket.handshake.headers);
-        if (!cookieHeader) {
-            return next(new Error("Authentication error: No cookie provided"));
-        }
-        const cookies = Object.fromEntries(
-            cookieHeader.split("; ").map(c => c.split("="))
-        );
+        console.log(cookieHeader)
+        if (!cookieHeader) return next(new Error("No cookie"));
+        console.log("Error In Auth 2")
+
+        const cookies = {};
+        cookieHeader.split(";").forEach(c => {
+            const [key, ...v] = c.trim().split("=");
+            cookies[key] = v.join("=");
+        });
 
         const userId = cookies.currentUserId;
-
-        if (!userId) {
-            return next(new Error("User not authenticated"));
-        }
+        if (!userId) return next(new Error("Unauthenticated"));
 
         const user = await User.findById(userId);
-        if (!user) {
-            return next(new Error("User not found"));
-        }
-        socket.user = user;
-        console.log("socketAuth error"+1)
+        if (!user) return next(new Error("User not found"));
 
+        socket.user = user;
         next();
-    } catch (error) {
-        console.log("socketAuth error")
-        next(new Error("Authentication error"));
-    }       
+    } catch (err) {
+        next(new Error("Socket auth failed"));
+    }
 };
+
 export default socketAuth;

@@ -15,12 +15,22 @@ function Home() {
 
   // ===== FETCH CONNECTIONS =====
   useEffect(() => {
-    axios.get("http://localhost:5000/api/lt/chat/getAllConnections", {
+    axios.get("http://localhost:8000/api/lt/chat/getAllConnections", {
       withCredentials: true
     })
       .then(res => setMembers(res.data.data))
       .catch(() => alert("Loading Problem"))
   }, [])
+  useEffect(() => {
+          socket.emit("say-hello1")
+          socket.on("say-hi1", () => {
+              try {
+                  console.log("Hi-allconnection1")
+              } catch (error) {
+                  console.error('Error in say-hi1:', error);
+              }
+          })
+      },[])
 
   // ===== CLICK CONTACT =====
   const handleClick = (connection) => {

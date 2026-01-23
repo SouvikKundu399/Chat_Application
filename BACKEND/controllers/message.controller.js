@@ -25,16 +25,27 @@ const sendMsg = async (currentUserId,chatId, message) => {
     return newMessage;
 }
 
-const getMsg = async (chatId) => {
+const getMsg = asyncHandeler(async (req, res) => {
+    const { chatId } = req.params
     if (!chatId) {
         throw new apiError(501, "Chat ID was not found")
     }
-    console.log("Chat ID: ",chatId);
+    console.log("Chat ID: ", chatId);
     const allMsg = await Message.find({ chatId });
-    // console.log("All Messages: ",allMsg);
-    
-    return allMsg;
-}
+    // console.log("All Messages: ", allMsg);
+
+
+    return res
+        .status(200)
+        .json(
+            new apiResponse(
+                200,
+                "All Messages fetched successfully",
+                allMsg,
+                req.originalUrl
+            )
+        );
+})
 
 const deleteMsg = async(msgId) => {
     if (!msgId){

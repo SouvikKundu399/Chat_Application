@@ -47,12 +47,12 @@ const addChat = asyncHandeler(async(req,res) => {
 })
 
 const getAllConnections = asyncHandeler(async(req,res) => {
-    console.log("req.user",req.user);
+    // console.log("req.user",req.user);
     const allConnections = await Chat.find({
         members: { $in: [req.user?._id] },
     }).populate("members","userName fullName avatar phoneNum mail description");
 
-    console.log(typeof allConnections);
+    // console.log(typeof allConnections);
     // if(allConnections.length === 0){
     //     throw new apiError(500,"Unable to fetch connections")
     // }   
@@ -67,7 +67,7 @@ const getAllConnections = asyncHandeler(async(req,res) => {
         }
     })));
 
-    console.log("User Connections: ",userConnections);
+    // console.log("User Connections: ",userConnections);
     return res
     .status(200)
     .json(

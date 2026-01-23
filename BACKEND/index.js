@@ -27,22 +27,41 @@ io.use(socketAuth)
 // socket io connection
 io.on("connection", (socket) => {
     socket.on("join-room", (roomId) => {
-        socket.join(roomId);
-        console.log(`User joined roomId: ${roomId}`);
-    });
-
-    socket.on("connected-user-info", async(chatId) => {
         try {
-            console.log("ChatId :", chatId);
-
-            const allMsg = await getMsg(chatId);
-            console.log("All Messages to send:", allMsg);
-            socket.emit("get-all-msg", allMsg);
-        } catch (err) {
-            console.error("Get messages error:", err);
-            socket.emit("error", "Failed to get messages");
+            socket.join(roomId);
+            console.log(`User joined roomId: ${roomId}`);
+        } catch (error) {
+            console.error('Error joining room:', error);
+        }
+    });
+    socket.on("say-hello", () => {
+        try {
+            console.log("Hello-login")
+            socket.emit("say-hi")
+        } catch (error) {
+            console.error('Error in say-hello:', error);
         }
     })
+    socket.on("say-hello1", () => {
+        try {
+            console.log("Hello-allconnection")
+            socket.emit("say-hi1")
+        } catch (error) {
+            console.error('Error in say-hello1:', error);
+        }
+    })
+    // socket.on("connected-user-info", async(chatId) => {
+    //     try {
+    //         console.log("ChatId :", chatId);
+
+    //         const allMsg = await getMsg(chatId);
+    //         console.log("All Messages to send:", allMsg);
+    //         socket.emit("get-all-msg", allMsg);
+    //     } catch (err) {
+    //         console.error("Get messages error:", err);
+    //         socket.emit("error", "Failed to get messages");
+    //     }
+    // })
     socket.on("send-message", async ({ chatId, message, roomId }) => {
         try {
             const currentUserId = socket.user?._id
@@ -81,14 +100,25 @@ io.on("connection", (socket) => {
         }
     })
     socket.on("leave-room", (roomId) => {
-        socket.leave(roomId);
+        try {
+            socket.leave(roomId);
+        } catch (error) {
+            console.error('Error leaving room:', error);
+        }
     });
+    socket.on("disconnect", () => {
+        try {
+            console.log("disconnected", socket.id)
+        } catch (error) {
+            console.error('Error on disconnect:', error);
+        }
+    })
 
 });
 
 connectDB()
     .then(() => {
-        server.listen(process.env.PORT || 5000, () => {
+        server.listen(process.env.PORT || 8000, () => {
             console.log("Server is created")
         })
     })

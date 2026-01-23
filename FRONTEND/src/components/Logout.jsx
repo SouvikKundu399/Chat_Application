@@ -13,7 +13,7 @@ function Logout() {
         e.preventDefault()
         try {
             await axios.post(
-                "http://localhost:5000/api/lt/user/logout",
+                "http://localhost:8000/api/lt/user/logout",
                 {},
                 { withCredentials: true }
             )
