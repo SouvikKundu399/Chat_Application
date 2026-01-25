@@ -1,15 +1,15 @@
 import dotenv from "dotenv"
-import { app } from "./app.js"
+dotenv.config({
+    path: "./.env"
+})
+// console.log("Environment Variables Loaded");
 import connectDB from "./db/index.js"
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
 import { deleteMsg, editMsg, sendMsg } from "./controllers/message.controller.js";
-import { getMsg } from "./controllers/message.controller.js";
 import socketAuth from "./middlewares/socketAuth.middleware.js";
+import { app } from "./app.js"
 
-dotenv.config({
-    path: "./.env"
-})
 
 const server = createServer(app);
 
@@ -34,22 +34,7 @@ io.on("connection", (socket) => {
             console.error('Error joining room:', error);
         }
     });
-    socket.on("say-hello", () => {
-        try {
-            console.log("Hello-login")
-            socket.emit("say-hi")
-        } catch (error) {
-            console.error('Error in say-hello:', error);
-        }
-    })
-    socket.on("say-hello1", () => {
-        try {
-            console.log("Hello-allconnection")
-            socket.emit("say-hi1")
-        } catch (error) {
-            console.error('Error in say-hello1:', error);
-        }
-    })
+    
     // socket.on("connected-user-info", async(chatId) => {
     //     try {
     //         console.log("ChatId :", chatId);

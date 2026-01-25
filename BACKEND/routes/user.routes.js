@@ -9,6 +9,10 @@ import {
     updatePhoneNumber,
     getUser
 } from "../controllers/user.controller.js"
+import { 
+    sendOTP, 
+    verifyOTP 
+} from "../controllers/otp.controller.js";
 import upload from "../middlewares/multer.middleware.js";
 import authentication from "../middlewares/authentication.middleware.js";
 
@@ -25,9 +29,14 @@ userRoute.route("/registration").post(
     registerUser
 )
 
-userRoute.route("/login").post(
+userRoute.route("/otpSend").post(
+    sendOTP,
+)
+userRoute.route("/verifyOtp_login").post(
+    verifyOTP,
     logIn
 )
+
 
 userRoute.route("/logout").post(
     authentication,

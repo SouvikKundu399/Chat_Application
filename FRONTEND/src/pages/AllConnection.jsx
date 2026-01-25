@@ -21,16 +21,6 @@ function Home() {
       .then(res => setMembers(res.data.data))
       .catch(() => alert("Loading Problem"))
   }, [])
-  useEffect(() => {
-          socket.emit("say-hello1")
-          socket.on("say-hi1", () => {
-              try {
-                  console.log("Hi-allconnection1")
-              } catch (error) {
-                  console.error('Error in say-hi1:', error);
-              }
-          })
-      },[])
 
   // ===== CLICK CONTACT =====
   const handleClick = (connection) => {
