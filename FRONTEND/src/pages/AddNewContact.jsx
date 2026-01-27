@@ -5,12 +5,13 @@ import { useNavigate } from 'react-router-dom'
 function AddNewContact() {
   const [phoneNum, setPhoneNum] = useState("")
   const navigate = useNavigate()
+  const Base_URL = import.meta.env.VITE_BACKEND_URL
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
     axios.post(
-      "http://localhost:8000/api/lt/chat/addChat",
+      `${Base_URL}/chat/addChat`,
       { mobileNumber: phoneNum },
       { withCredentials: true }
     )

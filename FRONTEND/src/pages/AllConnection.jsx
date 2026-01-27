@@ -12,10 +12,11 @@ function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  const Base_URL = import.meta.env.VITE_BACKEND_URL
 
   // ===== FETCH CONNECTIONS =====
   useEffect(() => {
-    axios.get("http://localhost:8000/api/lt/chat/getAllConnections", {
+    axios.get(`${Base_URL}/chat/getAllConnections`, {
       withCredentials: true
     })
       .then(res => setMembers(res.data.data))

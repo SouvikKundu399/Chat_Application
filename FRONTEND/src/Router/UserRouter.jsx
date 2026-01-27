@@ -5,6 +5,7 @@ import AllConnection from '../pages/AllConnection.jsx'
 import UpdateProfile from '../pages/UpdateProfile.jsx'
 import Chat from '../pages/Chat.jsx'
 import OtpSend from '../pages/OtpSend.jsx'
+import Home from '../pages/Home.jsx'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import AddNewContact from '../pages/AddNewContact.jsx'
 
@@ -12,6 +13,7 @@ function UserRouter() {
     return (
         <Router>
             <Routes>
+                <Route path="/" element={<Home />} />
                 <Route path="/login" element={<OtpSend />} />
                 <Route path="/verify-otp/:phoneNum" element={<Login />} />
                 <Route path="/registration" element={<Registration />} />

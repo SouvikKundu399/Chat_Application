@@ -1,11 +1,17 @@
 import React from 'react'
+import { PrimeReactProvider } from 'primereact/api';
 import './App.css'
-import UserRouter from './Router/userRouter.jsx'
+import UserRouter from './Router/UserRouter.jsx';
+
+
 function App() {
   return (
-    <div>
-      <UserRouter />
-    </div>
+    <PrimeReactProvider>
+      <div>
+        <UserRouter />
+      </div>
+    </PrimeReactProvider>
+    
   )
 }
 

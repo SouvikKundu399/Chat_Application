@@ -7,20 +7,20 @@ import { useDispatch } from "react-redux"
 import { socket } from '../socket'
 import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
+import { InputOtp } from 'primereact/inputotp';
 function Login() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
-
+    const Base_URL = import.meta.env.VITE_BACKEND_URL
     const [otp, setOtp] = useState('')
     const { phoneNum } = useParams(); // route param
 
     const phoneId = nanoid()
-
     const handelOnSubmit = async (e) => {
         e.preventDefault()
         try {
             const res = await axios.post(
-                "http://localhost:8000/api/lt/user/verifyOtp_login",
+                `${Base_URL}/user/verifyOtp_login`,
                 {
                     phoneNum: phoneNum,
                     otp: otp,
@@ -60,18 +60,12 @@ function Login() {
                         <label htmlFor={phoneId} className="block text-sm font-medium text-gray-600 mb-1">
                             Enter OTP
                         </label>
-                        <input
-                            id={phoneId}
-                            type="text"
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
-                            className="
-                w-full px-4 py-2.5 
-                border rounded-lg 
-                focus:outline-none focus:ring-1 focus:ring-green-500 
-                transition
-              "
-                        />
+                        <div className="flex justify-center">
+                            <InputOtp 
+                            length={6}
+                            value={otp} 
+                            onChange={(e) => setOtp(e.value)} />
+                        </div>
                     </div>
 
                     <button

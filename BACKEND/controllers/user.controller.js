@@ -41,7 +41,10 @@ const registerUser = asyncHandeler(async (req, res) => {
     //     throw new apiError(400, "Your OTP is not matching")
     // }
 
-    const avatarPath = req.fiels?.Path?.[0]?.path
+    const avatarPath = req.files?.avatar?.[0]?.path
+    // console.log(`avatarPath: `, avatarPath);
+    // const avatar = await uploadOnCloudinary(avatarPath)
+    // console.log("avatar: ", avatar);
     const newUser = await User.create({
         fullName,
         userName,
@@ -59,8 +62,8 @@ const registerUser = asyncHandeler(async (req, res) => {
     const currentUserId = `${newUser._id}`
     const options = {
         httpOnly: true,
-        sameSite: "lax",
-        secure: false
+        sameSite: "none",
+        secure: true
     }
     return res
         .status(200)
@@ -96,8 +99,8 @@ const logIn = asyncHandeler(async (req, res) => {
     const currentUserId = `${user._id}`
     const options = {
         httpOnly: true,
-        sameSite: "lax",
-        secure: false
+        sameSite: "none",
+        secure: true
     }
     return res
         .status(200)
@@ -118,12 +121,12 @@ const logIn = asyncHandeler(async (req, res) => {
 const logOut = asyncHandeler(async (req, res) => {
     const options = {
         httpOnly: true,
-        sameSite: "lax",
-        secure: false
+        sameSite: "none",
+        secure: true
     }
     return res
         .status(200)
-        .clearCookie("currentUserId",options)
+        .clearCookie("currentUserId", options)
         .json(
             new apiResponse(
                 200,

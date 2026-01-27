@@ -3,9 +3,10 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 
 const app = express();
-
+const FrontendURL = process.env.FRONTEND_URL;
+const LocalURL = process.env.LOCAL_URL;
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: [FrontendURL, LocalURL],
     methods: "GET,POST,PUT,DELETE,PATCH",
     credentials: true
 }));

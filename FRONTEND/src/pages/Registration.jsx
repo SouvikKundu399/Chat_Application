@@ -2,9 +2,14 @@ import React, { useState } from 'react'
 import { nanoid } from 'nanoid'
 import axios from 'axios'
 import { useNavigate } from 'react-router-dom'
+import { login } from '../redux/auth/authSlice'
+import { useDispatch } from "react-redux"
+import { socket } from '../socket'
 
 function Registration() {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const Base_URL = import.meta.env.VITE_BACKEND_URL
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -34,13 +39,15 @@ function Registration() {
     data.append("avatar", formData.avatar)
 
     try {
-      await axios.post(
-        "http://localhost:8000/api/lt/user/registration",
+      const res = await axios.post(
+        `${Base_URL}/user/registration`,
         data,
         { withCredentials: true }
       )
 
       alert("User Registered Successfully!")
+      dispatch(login(res.data.data.user))
+      socket.connect()
       navigate('/allcontacts')
 
     } catch (error) {

@@ -9,6 +9,8 @@ import { socket } from '../socket'
 function Chat() {
   const { id : chatId } = useParams()
   const navigate = useNavigate()
+  const Base_URL = import.meta.env.VITE_BACKEND_URL
+
 
   const [allChat, setAllChat] = useState([])
   const [editingId, setEditingId] = useState(null)
@@ -84,7 +86,7 @@ function Chat() {
 
   const handelAllChat = (chatId) => {
     axios.post(
-      `http://localhost:8000/api/lt/msg/getMsg/${chatId}`,
+      `${Base_URL}/msg/getMsg/${chatId}`,
       {},
       { withCredentials: true }
     )

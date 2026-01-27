@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 
 function OtpSend() {
     const navigate = useNavigate()
+    const Base_URL = import.meta.env.VITE_BACKEND_URL
 
     const [phone, setPhone] = useState('')
     const phoneId = nanoid()
@@ -12,7 +13,7 @@ function OtpSend() {
         e.preventDefault()
         try {
             const res = await axios.post(
-                "http://localhost:8000/api/lt/user/otpSend",
+                `${Base_URL}/user/otpSend`,
                 { phoneNum: phone },
                 { withCredentials: true }
             )
