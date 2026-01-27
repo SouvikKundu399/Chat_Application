@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express"
 import cors from "cors"
 import cookieParser from "cookie-parser"
@@ -5,6 +7,7 @@ import cookieParser from "cookie-parser"
 const app = express();
 const FrontendURL = process.env.FRONTEND_URL;
 const LocalURL = process.env.LOCAL_URL;
+
 app.use(cors({
     origin: [FrontendURL, LocalURL],
     methods: "GET,POST,PUT,DELETE,PATCH",
