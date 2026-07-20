@@ -65,7 +65,7 @@ const sendOTP = async (req, res) => {
         res.status(200).json({ message: "OTP sent to your email" });
     } catch (error) {
         console.error("Nodemailer Error:", error.message);
-        throw new Error("Failed to send email");
+        throw new apiError(500, "Failed to send email");
     }
 };
 
