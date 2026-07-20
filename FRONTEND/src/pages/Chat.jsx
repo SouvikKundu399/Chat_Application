@@ -10,7 +10,7 @@ function Chat() {
   const { id : chatId } = useParams()
   const navigate = useNavigate()
   const Base_URL = import.meta.env.VITE_BACKEND_URL
-
+  
 
   const [allChat, setAllChat] = useState([])
   const [editingId, setEditingId] = useState(null)
@@ -20,7 +20,7 @@ function Chat() {
 
   const memberName = useSelector((state) => state.auth.memberData?.user.fullName)
 
-  const currentUserId = useSelector((state) => state.auth.userData._id)
+  const currentUserId = useSelector((state) => state.auth.userData?._id)
   const roomId = generateRoomId(chatId)
 
 
