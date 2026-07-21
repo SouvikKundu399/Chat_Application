@@ -5,7 +5,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 
 const app = express();
-const FrontendURL = process.env.FRONTEND_URL;
+const FrontendURL = process.env.VITE_FRONTEND_URL;
 const LocalURL = process.env.LOCAL_URL;
 
 app.use(cors({
