@@ -5,7 +5,7 @@ export const socket = io(import.meta.env.VITE_BACKEND_URL || "http://localhost:8
     autoConnect: false,
     transports: ["websocket"], 
 })
-
+console.log("Socket initialized with URL:", import.meta.env.VITE_BACKEND_URL);
 // Add error handling
 socket.on('connect_error', (error) => {
     console.error('Socket connection error:', error);
