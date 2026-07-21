@@ -3,6 +3,8 @@ dotenv.config({
     path: "./.env"
 })
 // console.log("Environment Variables Loaded");
+// console.log("API:", process.env.RESEND_API_KEY);
+// console.log("FROM:", process.env.EMAIL_FROM);
 import connectDB from "./db/index.js"
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';

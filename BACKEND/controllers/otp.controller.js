@@ -1,9 +1,10 @@
 import bcrypt from "bcrypt";
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 import apiError from "../utils/apiError.utils.js";
 import User from "../models/user.model.js";
 
-// Using a Map to store OTPs temporarily 
+
+// Using a Map to store OTPs temporarily
 const otpStore = new Map();
 
 const generateOTP = async (phoneNum) => {
@@ -21,7 +22,6 @@ const generateOTP = async (phoneNum) => {
 
 //  Send OTP Email
 const sendOTP = async (req, res) => {
-    // console.log(process.env.EMAIL_USER, process.env.EMAIL_PASS);
     const { phoneNum } = req.body;
     if (!phoneNum) {
         throw new apiError(400, "Phone number is required");
@@ -39,40 +39,86 @@ const sendOTP = async (req, res) => {
     const otp = await generateOTP(phoneNum);
 
     try {
-        const transporter = nodemailer.createTransport({
-            host: "smtp.gmail.com",
-            port: 587,
-            secure: false,
-            auth: {
-                user: process.env.EMAIL_USER,
-                pass: process.env.EMAIL_PASS,
-            },
-            connectionTimeout: 10000,
-            greetingTimeout: 10000,
-            socketTimeout: 10000,
+        const resend = new Resend(process.env.RESEND_API_KEY);
+        const { data, error } = await resend.emails.send({
+            from: process.env.EMAIL_FROM,
+            to: mail,
+            subject: "Verify Your Email - OTP Code",
+            html: `
+        <div style="font-family: Arial, Helvetica, sans-serif; background:#f4f4f4; padding:40px 20px;">
+            <div style="max-width:600px; margin:auto; background:#ffffff; border-radius:10px; overflow:hidden; box-shadow:0 4px 10px rgba(0,0,0,0.1);">
+
+                <div style="background:#2563eb; color:#ffffff; padding:20px; text-align:center;">
+                    <h2 style="margin:0;">MsgMe</h2>
+                </div>
+
+                <div style="padding:30px;">
+                    <h2 style="color:#333;">Email Verification</h2>
+
+                    <p style="color:#555; line-height:1.6;">
+                        Hello,
+                    </p>
+
+                    <p style="color:#555; line-height:1.6;">
+                        Thank you for using <strong>MsgMe</strong>.
+                        Use the verification code below to complete your email verification.
+                    </p>
+
+                    <div style="text-align:center; margin:30px 0;">
+                        <div style="
+                            display:inline-block;
+                            padding:15px 35px;
+                            background:#2563eb;
+                            color:#ffffff;
+                            font-size:32px;
+                            font-weight:bold;
+                            border-radius:8px;
+                            letter-spacing:8px;
+                        ">
+                            ${otp}
+                        </div>
+                    </div>
+
+                    <p style="color:#555; line-height:1.6;">
+                        This OTP is valid for <strong>5 minutes</strong>.
+                    </p>
+
+                    <p style="color:#d32f2f; font-weight:bold;">
+                        Never share this code with anyone.
+                    </p>
+
+                    <hr style="border:none; border-top:1px solid #eee; margin:30px 0;">
+
+                    <p style="font-size:13px; color:#777;">
+                        If you didn't request this verification, you can safely ignore this email.
+                    </p>
+                </div>
+
+                <div style="background:#f8f8f8; padding:15px; text-align:center; font-size:12px; color:#777;">
+                    © ${new Date().getFullYear()} MsgMe. All rights reserved.
+                </div>
+
+            </div>
+        </div>
+        `,
         });
 
-    
-        const mailOptions = {
-            from: process.env.EMAIL_USER,
-            to: mail,
-            subject: "Your Verification Code",
-            text: `Your OTP is ${otp}. It is valid for 5 minutes. Do not share this with anyone.`
-        };
-    
-        await transporter.sendMail(mailOptions);
-        console.log(`Email successfully sent to ${mail}`);
+        if (error) {
+            console.error("Resend Error:", error);
+            throw new apiError(500, "Failed to send email");
+        }
+
+        console.log(`Email successfully sent to ${mail}, id: ${data?.id}`);
         res.status(200).json({ message: "OTP sent to your email" });
+
     } catch (error) {
-        console.error("Nodemailer Error:", error.message);
+        console.error("Email sending error:", error.message);
         throw new apiError(500, "Failed to send email");
     }
 };
 
-
 //  Verify OTP
-
-const verifyOTP = async (req, res,next) => {
+const verifyOTP = async (req, res, next) => {
     const { phoneNum, otp } = req.body;
 
     if (!phoneNum || !otp) {
