@@ -15,11 +15,12 @@ import { app } from "./app.js"
 
 const server = createServer(app);
 
+
 const io = new Server(server, {
     cors: {
         origin: [
-            import.meta.env.LOCAL_URL,
-            import.meta.env.VITE_FRONTEND_URL,
+            process.env.LOCAL_URL,
+            process.env.VITE_FRONTEND_URL,
         ],
         methods: "GET,POST,PUT,DELETE,PATCH",
         credentials: true
